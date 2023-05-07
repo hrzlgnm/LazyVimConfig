@@ -45,7 +45,14 @@ return {
     -- LSP Server Settings
     ---@type lspconfig.options
     servers = {
-      clangd = {},
+      clangd = {
+        on_new_config = function(new_config, new_root_dir)
+          local ok, cmake = pcall(require, "cmake-tools")
+          if ok then
+            cmake.clangd_on_new_config(new_config)
+          end
+        end,
+      },
       cmake = {},
       tsserver = {},
       rust_analyzer = {},

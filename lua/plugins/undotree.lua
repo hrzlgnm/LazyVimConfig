@@ -1,6 +1,6 @@
 return {
   "mbbill/undotree",
-  cmds = {
+  cmd = {
     "UndotreeToggle",
   },
   keys = {

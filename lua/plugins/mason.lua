@@ -1,6 +1,6 @@
 return {
   "williamboman/mason.nvim",
-  cmds = {
+  cmd = {
     "Mason",
   },
   opts = {
