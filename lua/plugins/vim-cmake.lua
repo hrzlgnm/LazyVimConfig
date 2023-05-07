@@ -1,5 +1,17 @@
 return {
   "cdelledonne/vim-cmake",
+  cmd = {
+    "CMakeBuild",
+    "CMakeGenerate",
+    "CMakeClean",
+    "CMakeCleanAll",
+    "CMakeBuildClean",
+    "CMakeBuildCleanAll",
+    "CMakeBuildDebug",
+    "CMakeBuildRelease",
+    "CMakeGenerateDebug",
+    "CMakeGenerateRelease",
+  },
   keys = {
     { "<leader>cb", "<cmd>CMakeBuild<cr>", desc = "[C]Make [B]uild" },
     { "<leader>cgr", "<cmd>CMakeGenerate Release<cr>", desc = "[C]Make [G]enerate [R]elease" },
