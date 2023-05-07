@@ -1,0 +1,30 @@
+return {
+  "Civitasv/cmake-tools.nvim",
+  cmd = {
+    "CMakeBuild",
+    "CMakeDebug",
+    "CMakeSelectBuildType",
+    "CMakeSelectBuildTarget",
+    "CMakeGenerate",
+    "CMakeClean",
+    "CMakeInstall",
+    "CMakeRun",
+    "CMakeOpen",
+    "CMakeClose",
+    "CMakeSelectKit",
+    "CMakeSelectConfigurePresets",
+    "CMakeSeletBuildpPreset",
+    "CMakeStop",
+  },
+  keys = {
+    { "<leader>cb", "<cmd>CMakeBuild<cr>", desc = "[C]Make [B]uild" },
+    { "<leader>cgr", "<cmd>CMakeGenerate Release<cr>", desc = "[C]Make [G]enerate [R]elease" },
+    { "<leader>cgd", "<cmd>CMakeGenerate Debug<cr>", desc = "[C]Make [G]enerate [D]debug" },
+  },
+  opts = {
+    cmake_build_directory = "build",
+    cmake_generate_options = { "-D", "CMAKE_EXPORT_COMPILE_COMMANDS=1" },
+    cmake_show_console = "only_on_error",
+    cmake_dap_configuration = { name = "cpp", type = "codelldb", reqest = "launch" },
+  },
+}
