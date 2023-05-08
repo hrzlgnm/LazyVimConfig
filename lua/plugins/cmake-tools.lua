@@ -1,5 +1,6 @@
 return {
-  "Civitasv/cmake-tools.nvim",
+  "hrzlgnm/cmake-tools.nvim",
+  branch = "implicit-preset-includes",
   cmd = {
     "CMakeBuild",
     "CMakeClean",
