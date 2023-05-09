@@ -17,7 +17,7 @@ return {
     dependencies = {
       "nvim-lua/plenary.nvim",
     },
-    setup = function()
+    config = function()
       require("telescope").load_extension("harpoon")
     end,
   },
