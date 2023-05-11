@@ -7,7 +7,7 @@ return {
         type = "server",
         port = "${port}",
         executable = {
-          command = "/home/valeni/.local/share/codelldb/extension/adapter/codelldb",
+          command = vim.fn.expand("~/.local/share/codelldb/extension/adapter/codelldb"),
           args = { "--port", "${port}" },
         },
       }
