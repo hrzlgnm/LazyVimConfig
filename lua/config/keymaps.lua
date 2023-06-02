@@ -16,5 +16,14 @@ local function map(mode, lhs, rhs, opts)
   end
 end
 
+-- yank everything between { } including {}
 map("n", "YY", "va{Vy")
+
+-- greatest remap ever
+map("x", "<leader>p", [["_dP]])
+-- next greatest remap ever : asbjornHaland
+map({ "n", "v" }, "<leader>y", [["+y]])
+map("n", "<leader>Y", [["+Y]])
+map({ "n", "v" }, "<leader>d", [["_d]])
+
 map("n", "<leader>mr", "<cmd>CellularAutomaton make_it_rain<CR>")
