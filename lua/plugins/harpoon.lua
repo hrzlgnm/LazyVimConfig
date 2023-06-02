@@ -44,6 +44,48 @@ return {
         end,
         desc = { "Harpoon jump to file 4" },
       },
+      {
+        "<M-5>",
+        function()
+          require("harpoon.ui").nav_file(5)
+        end,
+        desc = { "Harpoon jump to file 5" },
+      },
+      {
+        "<M-6>",
+        function()
+          require("harpoon.ui").nav_file(6)
+        end,
+        desc = { "Harpoon jump to file 6" },
+      },
+      {
+        "<M-7>",
+        function()
+          require("harpoon.ui").nav_file(7)
+        end,
+        desc = { "Harpoon jump to file 7" },
+      },
+      {
+        "<M-8>",
+        function()
+          require("harpoon.ui").nav_file(8)
+        end,
+        desc = { "Harpoon jump to file 8" },
+      },
+      {
+        "<M-9>",
+        function()
+          require("harpoon.ui").nav_file(9)
+        end,
+        desc = { "Harpoon jump to file 9" },
+      },
+      {
+        "<M-0>",
+        function()
+          require("harpoon.ui").nav_file(10)
+        end,
+        desc = { "Harpoon jump to file 10" },
+      },
     },
     opts = {},
     dependencies = {
