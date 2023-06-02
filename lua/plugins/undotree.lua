@@ -4,6 +4,6 @@ return {
     "UndotreeToggle",
   },
   keys = {
-    { "<leader>ut", "<cmd>UndotreeToggle<cr>" },
+    { "<leader>ut", "<cmd>UndotreeToggle<cr>", { desc = "Toggle undotree" } },
   },
 }
