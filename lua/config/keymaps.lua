@@ -17,13 +17,14 @@ local function map(mode, lhs, rhs, opts)
 end
 
 -- yank everything between { } including {}
-map("n", "YY", "va{Vy")
+map("n", "YY", "va{Vy", { desc = "Select everything between {} including {}" })
 
 -- greatest remap ever
-map("x", "<leader>p", [["_dP]])
+map("x", "<leader>p", [["_dP]], { desc = "Paste selected text over current selection" })
+
 -- next greatest remap ever : asbjornHaland
 map({ "n", "v" }, "<leader>y", [["+y]])
 map("n", "<leader>Y", [["+Y]])
 map({ "n", "v" }, "<leader>d", [["_d]])
 
-map("n", "<leader>mr", "<cmd>CellularAutomaton make_it_rain<CR>")
+map("n", "<leader>mr", "<cmd>CellularAutomaton make_it_rain<CR>", { desc = "Make it rain" })
