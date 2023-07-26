@@ -1,23 +1,12 @@
+if false then
+  return {}
+end
+
 return {
   {
     "hrzlgnm/cmake-tools.nvim",
     branch = "experimental",
-    cmd = {
-      "CMakeBuild",
-      "CMakeClean",
-      "CMakeClose",
-      "CMakeDebug",
-      "CMakeGenerate",
-      "CMakeInstall",
-      "CMakeOpen",
-      "CMakeRun",
-      "CMakeSelectBuildPreset",
-      "CMakeSelectBuildTarget",
-      "CMakeSelectBuildType",
-      "CMakeSelectConfigurePresets",
-      "CMakeSelectKit",
-      "CMakeStop",
-    },
+    event = "BufRead",
     keys = {
       { "<leader>cb", "<cmd>CMakeBuild<cr>", desc = "[C]Make [B]uild" },
     },

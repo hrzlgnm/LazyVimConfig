@@ -54,4 +54,10 @@ return {
     local g = vim.g
     g["test#javascript#mocha#options"] = "--ui tdd"
   end,
+  opts = {
+    adapters = {
+      ["neotest-rust"] = {},
+      ["neotest-plenary"] = {},
+    },
+  },
 }

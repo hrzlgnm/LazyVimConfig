@@ -5,6 +5,7 @@ return {
   },
   opts = {
     ensure_installed = {
+      "codelldb",
       "prettierd",
       "stylua",
       "shellcheck",
