@@ -1,5 +1,5 @@
 local build = "make"
-if vim.loop.os_uname().sysname == "Windows" then
+if vim.loop.os_uname().sysname == "Windows_NT" then
   build =
     "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build"
 end
