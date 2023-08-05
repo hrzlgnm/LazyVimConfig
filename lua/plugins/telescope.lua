@@ -1,10 +1,15 @@
+local build = "make"
+if vim.loop.os_uname().sysname == "Windows" then
+  build =
+    "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build"
+end
 return {
   {
     "telescope.nvim",
     dependencies = {
       {
         "nvim-telescope/telescope-fzf-native.nvim",
-        build = "make",
+        build = build,
         config = function()
           require("telescope").load_extension("fzf")
         end,
