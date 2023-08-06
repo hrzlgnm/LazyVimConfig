@@ -1,3 +1,5 @@
+local codelldb_path = require("mason-registry").get_package("codelldb"):get_install_path() .. "/extension"
+local codelldb_bin = codelldb_path .. "/adapter/codelldb"
 return {
   {
     "mfussenegger/nvim-dap",
@@ -7,7 +9,7 @@ return {
         type = "server",
         port = "${port}",
         executable = {
-          command = vim.fn.expand("~/.local/share/codelldb/extension/adapter/codelldb"),
+          command = codelldb_bin,
           args = { "--port", "${port}" },
         },
       }
