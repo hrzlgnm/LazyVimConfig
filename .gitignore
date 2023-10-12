@@ -1,10 +1,6 @@
-tt.*
 .tests
 doc/tags
 debug
-.repro
-foo.*
 *.log
 data
 lazy-lock.json
-lazyvim.json

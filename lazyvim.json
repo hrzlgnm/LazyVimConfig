@@ -1,0 +1,11 @@
+{
+  "extras": [
+    "coding.codeium",
+    "formatting.black",
+    "lang.python-semshi",
+    "lsp.none-ls"
+  ],
+  "news": {
+    "NEWS.md": "2035"
+  }
+}
