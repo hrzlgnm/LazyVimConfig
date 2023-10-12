@@ -3,7 +3,8 @@
     "coding.codeium",
     "formatting.black",
     "lang.python-semshi",
-    "lsp.none-ls"
+    "lsp.none-ls",
+    "util.dot"
   ],
   "news": {
     "NEWS.md": "2035"
