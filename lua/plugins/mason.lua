@@ -7,7 +7,7 @@ return {
     ensure_installed = {
       "black",
       "codelldb",
-      "prettierd",
+      "prettier",
       "stylua",
       "shellcheck",
       "shfmt",
