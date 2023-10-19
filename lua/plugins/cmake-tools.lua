@@ -6,7 +6,7 @@ return {
   {
     "Civitasv/cmake-tools.nvim",
     event = "BufRead",
-    cmd = "CMakeBuild",
+    cmd = { "CMakeBuild", "CMakeGenerate", "CMakeRun", "CMakeDebug" },
     opts = {
       cmake_build_directory = "build",
       cmake_build_directory_prefix = "",
