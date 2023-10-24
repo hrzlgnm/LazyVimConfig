@@ -15,3 +15,13 @@ vim.api.nvim_create_autocmd("BufReadPost", {
     vim.bo.filetype = "dosini"
   end,
 })
+
+vim.api.nvim_create_autocmd("BufReadPost", {
+  group = augroup("mark_syntax_as_grovy"),
+  pattern = {
+    "Jenkinsfile*",
+  },
+  callback = function()
+    vim.bo.filetype = "groovy"
+  end,
+})
