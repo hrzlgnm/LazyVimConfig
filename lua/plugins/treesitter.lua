@@ -19,6 +19,7 @@ return {
       "gitignore",
       "git_rebase",
       "go",
+      "groovy",
       "hocon",
       "html",
       "ini",
