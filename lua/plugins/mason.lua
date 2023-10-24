@@ -7,11 +7,12 @@ return {
     ensure_installed = {
       "black",
       "codelldb",
+      "flake8",
+      "groovy-language-server",
       "prettier",
-      "stylua",
       "shellcheck",
       "shfmt",
-      "flake8",
+      "stylua",
     },
   },
 }
