@@ -9,6 +9,7 @@ return {
       "codelldb",
       "flake8",
       "groovy-language-server",
+      "powershell-editor-services",
       "prettier",
       "shellcheck",
       "shfmt",
