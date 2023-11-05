@@ -7,6 +7,7 @@ return {
     ensure_installed = {
       "beautysh",
       "black",
+      "clang-format",
       "codelldb",
       "flake8",
       "groovy-language-server",
