@@ -5,6 +5,7 @@ return {
   },
   opts = {
     ensure_installed = {
+      "bash-language-server",
       "beautysh",
       "black",
       "clang-format",
@@ -16,6 +17,7 @@ return {
       "prettier",
       "shellcheck",
       "shfmt",
+      "shellharden",
       "stylua",
     },
   },
