@@ -4,3 +4,4 @@ debug
 *.log
 data
 lazy-lock.json
+.luarc.json
