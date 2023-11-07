@@ -8,6 +8,7 @@ return {
       "beautysh",
       "black",
       "clang-format",
+      "cmakelint",
       "codelldb",
       "flake8",
       "groovy-language-server",
