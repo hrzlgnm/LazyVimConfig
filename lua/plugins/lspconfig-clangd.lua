@@ -6,11 +6,15 @@ return {
         opts.capabilities.offsetEncoding = { "utf-16" }
       end,
     },
-    on_new_config = function(new_config, _)
-      local ok, cmake = pcall(require, "cmake-tools")
-      if ok then
-        cmake.clangd_on_new_config(new_config)
-      end
-    end,
+    servers = {
+      clangd = {
+        on_new_config = function(new_config, _)
+          local ok, cmake = pcall(require, "cmake-tools")
+          if ok then
+            cmake.clangd_on_new_config(new_config)
+          end
+        end,
+      },
+    },
   },
 }
