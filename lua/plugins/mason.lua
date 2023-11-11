@@ -13,6 +13,7 @@ return {
       "codelldb",
       "flake8",
       "groovy-language-server",
+      "markdownlint",
       "quick-lint-js",
       "prettier",
       "shellcheck",
