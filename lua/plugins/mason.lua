@@ -13,6 +13,7 @@ return {
       "codelldb",
       "flake8",
       "groovy-language-server",
+      "hadolint",
       "markdownlint",
       "quick-lint-js",
       "prettier",
