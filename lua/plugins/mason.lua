@@ -22,6 +22,7 @@ return {
       "shellharden",
       "shfmt",
       "stylua",
+      "terraform-ls",
     },
   },
 }
