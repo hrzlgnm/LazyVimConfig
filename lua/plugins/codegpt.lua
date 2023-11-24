@@ -11,6 +11,7 @@ return {
     vim.g["codegpt_openai_api_provider"] = "OpenAI" -- or Azure
     if is_thunk then
       vim.g["codegpt_chat_completions_url"] = "http://docker.linetco.com:5000/v1/chat/completions"
+      vim.g["codegpt_openai_api_key"] = "dummy"
     else
       vim.g["codegpt_openai_api_key"] = os.getenv("OPENAI_API_KEY")
     end
