@@ -32,6 +32,7 @@ return {
       "markdown",
       "markdown_inline",
       "ninja",
+      "puppet",
       "python",
       "query",
       "regex",
