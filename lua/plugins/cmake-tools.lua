@@ -5,7 +5,7 @@ end
 return {
   {
     "Civitasv/cmake-tools.nvim",
-    event = "BufRead",
+    event = "LazyFile",
     cmd = { "CMakeBuild", "CMakeGenerate", "CMakeRun", "CMakeDebug" },
     config = function()
       require("cmake-tools").setup({
