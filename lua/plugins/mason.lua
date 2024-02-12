@@ -6,7 +6,6 @@ return {
   opts = {
     ensure_installed = {
       "bash-language-server",
-      "beautysh",
       "black",
       "clang-format",
       "cmakelint",
@@ -22,7 +21,6 @@ return {
       "shellharden",
       "shfmt",
       "stylua",
-      "terraform-ls",
     },
   },
 }
