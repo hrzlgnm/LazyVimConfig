@@ -9,7 +9,7 @@ return {
     cmd = { "CMakeBuild", "CMakeGenerate", "CMakeRun", "CMakeDebug" },
     config = function()
       require("cmake-tools").setup({
-        cmake_build_directory = "build-${variant:buildType}",
+        cmake_build_directory = "build",
         cmake_generate_options = generate_options,
         cmake_soft_link_compile_commands = true,
       })
