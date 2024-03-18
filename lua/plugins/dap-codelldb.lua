@@ -1,6 +1,10 @@
 return {
   {
     "mfussenegger/nvim-dap",
+    dependencies = {
+      -- tempowawy woakawound for dap-ui depending on nvim-nio
+      "nvim-neotest/nvim-nio",
+    },
     config = function()
       local dap = require("dap")
       dap.adapters.codelldb = {
