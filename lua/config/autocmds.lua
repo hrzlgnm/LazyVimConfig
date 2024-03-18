@@ -25,3 +25,10 @@ vim.api.nvim_create_autocmd("BufReadPost", {
     vim.bo.filetype = "groovy"
   end,
 })
+
+vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost" }, {
+  group = augroup("auto-lint"),
+  callback = function()
+    require("lint").try_lint()
+  end,
+})
