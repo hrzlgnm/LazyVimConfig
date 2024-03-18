@@ -9,7 +9,7 @@ end
 vim.api.nvim_create_autocmd("BufReadPost", {
   group = augroup("mark_syntax_as_dosini"),
   pattern = {
-    "diloconboard.conf",
+    "diloconboard*.conf",
   },
   callback = function()
     vim.bo.filetype = "dosini"
@@ -20,6 +20,7 @@ vim.api.nvim_create_autocmd("BufReadPost", {
   group = augroup("mark_syntax_as_grovy"),
   pattern = {
     "Jenkinsfile*",
+    "*.jenkinsfile",
   },
   callback = function()
     vim.bo.filetype = "groovy"
