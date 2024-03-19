@@ -3,6 +3,7 @@ return {
   config = function()
     require("lint").linters_by_ft = {
       bitbake = { "oelint-adv" },
+      systemd = { "systemdlint" },
     }
   end,
 }

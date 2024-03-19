@@ -27,6 +27,27 @@ vim.api.nvim_create_autocmd("BufReadPost", {
   end,
 })
 
+vim.api.nvim_create_autocmd("BufReadPost", {
+  group = augroup("mark_syntax_as_systemd"),
+  pattern = {
+    "*.automount",
+    "*.device",
+    "*.link",
+    "*.mount",
+    "*.network",
+    "*.scope",
+    "*.service",
+    "*.slice",
+    "*.socket",
+    "*.swap",
+    "*.target",
+    "*.timer",
+  },
+  callback = function()
+    vim.bo.filetype = "systemd"
+  end,
+})
+
 vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost" }, {
   group = augroup("auto-lint"),
   callback = function()
