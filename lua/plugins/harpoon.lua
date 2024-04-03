@@ -1,6 +1,6 @@
 return {
   {
-    "theprimeagen/harpoon",
+    "ThePrimeagen/harpoon",
     keys = {
       {
         "<leader>ha",
