@@ -10,6 +10,7 @@ vim.api.nvim_create_autocmd("BufReadPost", {
   group = augroup("mark_syntax_as_dosini"),
   pattern = {
     "diloconboard*.conf",
+    "compy*.conf*",
   },
   callback = function()
     vim.bo.filetype = "dosini"
