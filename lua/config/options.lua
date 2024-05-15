@@ -2,18 +2,36 @@
 -- Default options that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
 -- Add any additional options here
 
+-- @todo: redo this per file type like done by tj devries in https://github.com/tjdevries/config.nvim/tree/master/after/ftplugin
 local opt = vim.opt
-opt.autoindent = true
-opt.cindent = true
-opt.wrap = true
+
+-- stolen from https://github.com/tjdevries/config.nvim/blob/master/plugin/options.lua
+opt.inccommand = "split"
+
+opt.smartcase = true
+opt.ignorecase = true
+-- personal perference
 opt.relativenumber = true
 opt.number = true
+
+opt.splitbelow = true
+opt.splitright = true
+
+opt.signcolumn = "yes"
+opt.shada = { "'10", "<0", "s10", "h" }
+
+opt.clipboard = "unnamedplus"
+
+-- Don't have `o` add a comment
+opt.formatoptions:remove("o")
+
+opt.wrap = true
 opt.shiftwidth = 4
 opt.tabstop = 4
 opt.softtabstop = 4
 opt.expandtab = true
 opt.breakindent = true
-opt.showbreak = "   "
+opt.showbreak = "> "
 opt.linebreak = true
 
 opt.foldmethod = "marker"
@@ -33,17 +51,10 @@ opt.pumblend = 17
 opt.wildmode = "longest:full"
 opt.wildoptions = "pum"
 
-opt.incsearch = true
-opt.showmatch = true
-opt.ignorecase = true
-opt.smartcase = true
-opt.hidden = true
-opt.equalalways = true
-opt.splitright = true
-opt.splitbelow = true
 opt.updatetime = 1000
 opt.scrolloff = 10
 
+-- Make some some providers shut up
 local g = vim.g
 g.loaded_perl_provider = 0
 g.loaded_ruby_provider = 0
