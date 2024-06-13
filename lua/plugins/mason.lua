@@ -3,7 +3,6 @@ local function get_opts()
   local to_install = {
     "bash-language-server",
     "cmakelint",
-    "gersemi",
     "groovy-language-server",
     "hadolint",
     "markdownlint",
