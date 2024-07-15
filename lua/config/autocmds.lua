@@ -69,9 +69,9 @@ local function select_sortable_range(bufnr, line, col, end_line, end_col)
 ]])
 end
 
-local function is_strictly_sorted_ascending(tbl)
+local function is_strictly_sorted_ascending_nocase(tbl)
   for i = 1, #tbl - 1 do
-    if tbl[i] >= tbl[i + 1] then
+    if tbl[i]:lower() >= tbl[i + 1]:lower() then
       return false
     end
   end
@@ -82,7 +82,7 @@ local function flatten(tbl)
   local flat = {}
   for _, outer in ipairs(tbl) do
     for _, inner in ipairs(outer) do
-      if not inner.drop and not is_strictly_sorted_ascending(inner.args) then
+      if not inner.drop and not is_strictly_sorted_ascending_nocase(inner.args) then
         table.insert(flat, inner)
       end
     end
