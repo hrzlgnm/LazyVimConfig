@@ -59,7 +59,8 @@ vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost" }, {
 local api = vim.api
 -- @todo use vim.treesitter.query.get_node_text instead
 local ts_utils = require("nvim-treesitter.ts_utils")
-local get_node_text = ts_utils.get_node_text
+local ts_query = vim.treesitter.query
+local get_node_text = ts_query.get_node_text or ts_utils.get_node_text
 
 local function select_sortable_range(bufnr, line, col, end_line, end_col)
   api.nvim_buf_set_mark(bufnr, "<", line + 1, col, {})
@@ -69,6 +70,7 @@ local function select_sortable_range(bufnr, line, col, end_line, end_col)
 ]])
 end
 
+-- @todo perhaps consider using utf8 aware string compare
 local function is_strictly_sorted_ascending_nocase(tbl)
   for i = 1, #tbl - 1 do
     if tbl[i]:lower() >= tbl[i + 1]:lower() then
@@ -78,7 +80,7 @@ local function is_strictly_sorted_ascending_nocase(tbl)
   return true
 end
 
-local function flatten(tbl)
+local function flatten_filter(tbl)
   local flat = {}
   for _, outer in ipairs(tbl) do
     for _, inner in ipairs(outer) do
@@ -92,6 +94,7 @@ end
 
 local special_keywords = { "INTERFACE", "PUBLIC", "PRIVATE" }
 
+-- @todo: support more commands line add_library or add_executable
 local function cmake_select_first_sortable_range()
   local query = vim.treesitter.query.parse(
     "cmake",
@@ -105,7 +108,6 @@ local function cmake_select_first_sortable_range()
       (identifier) @command_name
       (argument_list (argument)+ @argument)
     (#eq? @command_name "target_link_libraries"))
-
 ]]
   )
 
@@ -143,7 +145,7 @@ local function cmake_select_first_sortable_range()
     end
     table.insert(all_sortables, sortables)
   end
-  local flat = flatten(all_sortables)
+  local flat = flatten_filter(all_sortables)
 
   for _, r in ipairs(flat) do
     select_sortable_range(bufnr, unpack(r.range))
