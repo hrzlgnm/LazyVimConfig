@@ -9,7 +9,8 @@ local opt = vim.opt
 opt.inccommand = "split"
 
 opt.smartcase = true
-opt.ignorecase = true
+opt.ignorecase = false
+
 -- personal perference
 opt.relativenumber = true
 opt.number = true
