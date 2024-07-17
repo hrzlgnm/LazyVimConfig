@@ -1,12 +1,13 @@
 -- Autocmds are automatically loaded on the VeryLazy event
 -- Default autocmds that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/autocmds.lua
 -- Add any additional autocmds here
+local api = vim.api
 
 local function augroup(name)
-  return vim.api.nvim_create_augroup("lazyvim_" .. name, { clear = true })
+  return api.nvim_create_augroup("lazyvim_" .. name, { clear = true })
 end
 
-vim.api.nvim_create_autocmd("BufReadPost", {
+api.nvim_create_autocmd("BufReadPost", {
   group = augroup("mark_syntax_as_dosini"),
   pattern = {
     "diloconboard*.conf",
@@ -17,7 +18,7 @@ vim.api.nvim_create_autocmd("BufReadPost", {
   end,
 })
 
-vim.api.nvim_create_autocmd("BufReadPost", {
+api.nvim_create_autocmd("BufReadPost", {
   group = augroup("mark_syntax_as_grovy"),
   pattern = {
     "Jenkinsfile*",
@@ -28,7 +29,7 @@ vim.api.nvim_create_autocmd("BufReadPost", {
   end,
 })
 
-vim.api.nvim_create_autocmd("BufReadPost", {
+api.nvim_create_autocmd("BufReadPost", {
   group = augroup("mark_syntax_as_systemd"),
   pattern = {
     "*.automount",
@@ -49,25 +50,19 @@ vim.api.nvim_create_autocmd("BufReadPost", {
   end,
 })
 
-vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost" }, {
+api.nvim_create_autocmd({ "BufWritePost", "BufReadPost" }, {
   group = augroup("auto-lint"),
   callback = function()
     require("lint").try_lint()
   end,
 })
 
-local api = vim.api
--- @todo use vim.treesitter.query.get_node_text instead
-local ts_utils = require("nvim-treesitter.ts_utils")
-local ts_query = vim.treesitter.query
-local get_node_text = ts_query.get_node_text or ts_utils.get_node_text
+local get_node_text = vim.treesitter.get_node_text
 
 local function select_sortable_range(bufnr, line, col, end_line, end_col)
   api.nvim_buf_set_mark(bufnr, "<", line + 1, col, {})
   api.nvim_buf_set_mark(bufnr, ">", end_line + 1, end_col - 1, {})
-  vim.cmd([[
-    normal! gv
-]])
+  vim.cmd([[normal! gv]])
 end
 
 -- @todo perhaps consider using utf8 aware string compare
@@ -80,11 +75,11 @@ local function is_strictly_sorted_ascending_nocase(tbl)
   return true
 end
 
-local function flatten_filter(tbl)
+local function filter_out_sorted_and_dropped_and_flatten(tbl)
   local flat = {}
   for _, outer in ipairs(tbl) do
     for _, inner in ipairs(outer) do
-      if not inner.drop and not is_strictly_sorted_ascending_nocase(inner.args) then
+      if not inner.dropped and not is_strictly_sorted_ascending_nocase(inner.args) then
         table.insert(flat, inner)
       end
     end
@@ -99,11 +94,12 @@ local function cmake_select_first_sortable_range()
   local query = vim.treesitter.query.parse(
     "cmake",
     [[
+    ; matches all args inside a normal command target_sources
     (normal_command
       (identifier) @command_name
       (argument_list (argument)+ @argument)
     (#eq? @command_name "target_sources"))
-    ;
+    ; matches all args inside a normal command target_link_libraries
     (normal_command
       (identifier) @command_name
       (argument_list (argument)+ @argument)
@@ -122,14 +118,14 @@ local function cmake_select_first_sortable_range()
       local capture_name = query.captures[id]
       if capture_name == "argument" then
         for _, node in ipairs(nodes) do
-          local argument_value = get_node_text(node, bufnr)[1]
+          local argument_value = get_node_text(node, bufnr)
           -- mark target or special_keywords as dropped
           if #sortables == 0 or vim.tbl_contains(special_keywords, argument_value) then
-            table.insert(sortables, { drop = true })
+            table.insert(sortables, { dropped = true })
           else
             local range = { node:range() }
             local last = sortables[#sortables]
-            if not last.drop then
+            if not last.dropped then
               -- extend range end_line and end_col
               last.range[3] = range[3]
               last.range[4] = range[4]
@@ -145,9 +141,10 @@ local function cmake_select_first_sortable_range()
     end
     table.insert(all_sortables, sortables)
   end
-  local flat = flatten_filter(all_sortables)
 
-  for _, r in ipairs(flat) do
+  local sortable = filter_out_sorted_and_dropped_and_flatten(all_sortables)
+
+  for _, r in ipairs(sortable) do
     select_sortable_range(bufnr, unpack(r.range))
     break
   end
