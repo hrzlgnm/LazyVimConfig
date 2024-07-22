@@ -89,7 +89,7 @@ end
 
 local special_keywords = { "INTERFACE", "PUBLIC", "PRIVATE" }
 
--- @todo: support more commands line add_library or add_executable
+-- @todo: support more commands line add_library or add_executable and list like set
 local function cmake_select_first_sortable_range()
   local query = vim.treesitter.query.parse(
     "cmake",
