@@ -5,6 +5,9 @@
 -- @todo: redo this per file type like done by tj devries in https://github.com/tjdevries/config.nvim/tree/master/after/ftplugin
 local opt = vim.opt
 
+-- keep line ends as they are
+opt.fileformats = "unix,dos,mac"
+
 -- stolen from https://github.com/tjdevries/config.nvim/blob/master/plugin/options.lua
 opt.inccommand = "split"
 
