@@ -74,7 +74,7 @@ vim.api.nvim_create_autocmd("BufWritePre", {
   callback = function()
     local last_line = vim.fn.getline(vim.fn.line("$"))
     if last_line ~= "" then
-      vim.fn.setline(vim.fn.line("$"), "")
+      vim.fn.append(vim.fn.line("$"), "")
     end
   end,
 })
@@ -172,5 +172,3 @@ local function cmake_select_first_sortable_range()
     break
   end
 end
-
-api.nvim_create_user_command("CMakeSelectFirstSortableRange", cmake_select_first_sortable_range, {})
