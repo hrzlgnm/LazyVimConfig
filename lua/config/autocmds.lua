@@ -69,7 +69,7 @@ api.nvim_create_autocmd({ "BufWritePost", "BufReadPost" }, {
 
 -- Ensure an empty line at the end of the file
 vim.api.nvim_create_autocmd("BufWritePre", {
-  grouo = augroup("auto-new-line"),
+  group = augroup("auto-new-line"),
   pattern = "*",
   callback = function()
     local last_line = vim.fn.getline(vim.fn.line("$"))
