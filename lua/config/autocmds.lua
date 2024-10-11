@@ -172,3 +172,5 @@ local function cmake_select_first_sortable_range()
     break
   end
 end
+
+api.nvim_create_user_command("CMakeSelectFirstSortableRange", cmake_select_first_sortable_range, {})
