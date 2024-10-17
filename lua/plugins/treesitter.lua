@@ -30,6 +30,7 @@ return {
         "javascript",
         "jq",
         "json",
+        "json5",
         "lua",
         "make",
         "markdown",
