@@ -19,16 +19,6 @@ api.nvim_create_autocmd("BufReadPost", {
 })
 
 api.nvim_create_autocmd("BufReadPost", {
-  group = augroup("mark_json5_syntax_as_jsonc"),
-  pattern = {
-    "*.json5",
-  },
-  callback = function()
-    vim.bo.filetype = "jsonc"
-  end,
-})
-
-api.nvim_create_autocmd("BufReadPost", {
   group = augroup("mark_syntax_as_grovy"),
   pattern = {
     "Jenkinsfile*",
