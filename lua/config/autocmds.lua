@@ -57,18 +57,6 @@ api.nvim_create_autocmd({ "BufWritePost", "BufReadPost" }, {
   end,
 })
 
--- Ensure an empty line at the end of the file
-vim.api.nvim_create_autocmd("BufWritePre", {
-  group = augroup("auto-new-line"),
-  pattern = "*",
-  callback = function()
-    local last_line = vim.fn.getline(vim.fn.line("$"))
-    if last_line ~= "" then
-      vim.fn.append(vim.fn.line("$"), "")
-    end
-  end,
-})
-
 --- cmake sort magic
 local get_node_text = vim.treesitter.get_node_text
 
