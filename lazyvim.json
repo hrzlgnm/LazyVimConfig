@@ -20,7 +20,6 @@
     "lazyvim.plugins.extras.editor.refactoring",
     "lazyvim.plugins.extras.editor.snacks_picker",
     "lazyvim.plugins.extras.formatting.black",
-    "lazyvim.plugins.extras.lang.angular",
     "lazyvim.plugins.extras.lang.clangd",
     "lazyvim.plugins.extras.lang.cmake",
     "lazyvim.plugins.extras.lang.docker",
