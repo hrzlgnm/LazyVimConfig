@@ -21,7 +21,6 @@ map("n", "YY", "va{Vy", { desc = "Select everything between {} including {}" })
 
 -- greatest remap ever
 map("x", "<leader>p", [["_dP]], { desc = "Paste selected text over current selection" })
-map("n", "<leader>mr", "<cmd>CellularAutomaton make_it_rain<CR>", { desc = "Make it rain" })
 map(
   "n",
   "<m-y>",
