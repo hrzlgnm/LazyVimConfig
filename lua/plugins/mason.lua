@@ -1,5 +1,4 @@
 local function get_opts()
-  local libc_is_musl = vim.fn.getfperm("/usr/lib/libc.so"):match("x") == "x"
   local to_install = {
     "bash-language-server",
     "cmakelint",
@@ -12,17 +11,11 @@ local function get_opts()
     "shellharden",
     "shfmt",
     "stylua",
+    "clangd",
+    "clang-format",
+    "codelldb",
   }
-  local excluded = {}
-  if libc_is_musl then
-    table.insert(excluded, "clang-format")
-    table.insert(excluded, "codelldb")
-    table.insert(excluded, "clangd")
-  else
-    table.insert(to_install, "clang-format")
-    table.insert(to_install, "codelldb")
-  end
-  return { ensure_installed = to_install, automatic_installation = { exclude = excluded } }
+  return { ensure_installed = to_install, automatic_installation = {} }
 end
 
 return {
