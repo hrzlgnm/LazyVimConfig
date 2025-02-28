@@ -8,7 +8,7 @@ return {
     image = {},
     indent = {},
     notifier = {},
-    scroll = { enabled = true },
+    scroll = { enabled = false },
     terminal = { enabled = true },
     wrods = { enanled = true },
     zen = { enabled = true },
