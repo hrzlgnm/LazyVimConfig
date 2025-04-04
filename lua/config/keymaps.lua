@@ -20,7 +20,7 @@ end
 map("n", "YY", "va{Vy", { desc = "Select everything between {} including {}" })
 
 -- greatest remap ever
-map("x", "<leader>p", [["_dP]], { desc = "Paste selected text over current selection" })
+map("x", "<leader>p", [["_d"+P]], { desc = "Paste selected text over current selection" })
 map(
   "n",
   "<m-y>",
