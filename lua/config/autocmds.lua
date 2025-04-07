@@ -152,3 +152,10 @@ local function cmake_select_first_sortable_range()
 end
 
 api.nvim_create_user_command("CMakeSelectFirstSortableRange", cmake_select_first_sortable_range, {})
+
+local hostname = vim.loop.os_gethostname()
+if hostname == "thunk" then
+  vim.defer_fn(function()
+    vim.cmd("Copilot disable")
+  end, 0)
+end
