@@ -1,19 +1,18 @@
 local function get_opts()
   local to_install = {
     "bash-language-server",
-    "cmakelint",
+    "clang-format",
+    "clangd",
+    "codelldb",
+    "gersemi",
     "groovy-language-server",
     "hadolint",
     "markdownlint",
-    "prettier",
     "quick-lint-js",
     "shellcheck",
     "shellharden",
     "shfmt",
     "stylua",
-    "clangd",
-    "clang-format",
-    "codelldb",
   }
   return { ensure_installed = to_install, automatic_installation = {} }
 end
