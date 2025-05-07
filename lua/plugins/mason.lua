@@ -7,6 +7,7 @@ local function get_opts()
     "gersemi",
     "groovy-language-server",
     "hadolint",
+    "json-lsp",
     "markdownlint",
     "quick-lint-js",
     "shellcheck",
