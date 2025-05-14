@@ -10,7 +10,7 @@ return {
     notifier = {},
     scroll = { enabled = false },
     terminal = { enabled = true },
-    wrods = { enanled = true },
+    wrods = { enabled = true },
     zen = { enabled = true },
   },
 }
