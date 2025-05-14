@@ -110,7 +110,14 @@ local function cmake_select_first_sortable_range()
 
   local bufnr = api.nvim_get_current_buf()
   local parser = vim.treesitter.get_parser(bufnr, "cmake")
-  local tree = parser:parse()[1]
+  if parser == nil then
+    return
+  end
+  local parsed = parser:parse()
+  if parsed == nil then
+    return
+  end
+  local tree = parsed[1]
   local root = tree:root()
   local all_sortables = {}
   for _, matches, _ in query:iter_matches(root, bufnr, 0, -1, { all = true }) do
