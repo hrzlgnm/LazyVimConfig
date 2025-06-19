@@ -30,6 +30,16 @@ api.nvim_create_autocmd("BufReadPost", {
 })
 
 api.nvim_create_autocmd("BufReadPost", {
+  group = augroup("mark_syntax_as_yaml"),
+  pattern = {
+    ".gersemirc*",
+  },
+  callback = function()
+    vim.bo.filetype = "yaml"
+  end,
+})
+
+api.nvim_create_autocmd("BufReadPost", {
   group = augroup("mark_syntax_as_systemd"),
   pattern = {
     "*.automount",
