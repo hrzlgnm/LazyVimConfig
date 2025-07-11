@@ -11,12 +11,17 @@ opt.fileformats = "unix,dos,mac"
 -- stolen from https://github.com/tjdevries/config.nvim/blob/master/plugin/options.lua
 opt.inccommand = "split"
 
+-- Search options
+opt.hlsearch = false
+opt.ignorecase = true
+opt.incsearch = true
 opt.smartcase = true
-opt.ignorecase = false
 
 -- personal perference
 opt.relativenumber = true
 opt.number = true
+opt.scrolloff = 10
+opt.sidescrolloff = 8
 
 opt.splitbelow = true
 opt.splitright = true
@@ -24,7 +29,11 @@ opt.splitright = true
 opt.signcolumn = "yes"
 opt.shada = { "'10", "<0", "s10", "h" }
 
-opt.clipboard = "unnamedplus"
+opt.mouse = "a"
+opt.clipboard:append("unnamedplus")
+
+opt.autoread = true
+opt.autowrite = false
 
 -- Don't have `o` add a comment
 opt.formatoptions:remove("o")
@@ -35,8 +44,12 @@ opt.tabstop = 4
 opt.softtabstop = 4
 opt.expandtab = true
 opt.breakindent = true
+opt.smartindent = true
+opt.autoindent = true
 opt.showbreak = "> "
 opt.linebreak = true
+
+opt.backspace = "indent,eol,start"
 
 opt.foldmethod = "marker"
 opt.foldlevel = 0
@@ -56,7 +69,6 @@ opt.wildmode = "longest:full"
 opt.wildoptions = "pum"
 
 opt.updatetime = 1000
-opt.scrolloff = 10
 
 -- Make some some providers shut up
 local g = vim.g
