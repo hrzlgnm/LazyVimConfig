@@ -7,6 +7,7 @@ local function augroup(name)
   return api.nvim_create_augroup("lazyvim_" .. name, { clear = true })
 end
 
+-- mark certain config files as ini syntax
 api.nvim_create_autocmd("BufReadPost", {
   group = augroup("mark_syntax_as_dosini"),
   pattern = {
@@ -18,6 +19,7 @@ api.nvim_create_autocmd("BufReadPost", {
   end,
 })
 
+-- Mark .jenkinsfile* files as groovy syntax
 api.nvim_create_autocmd("BufReadPost", {
   group = augroup("mark_syntax_as_grovy"),
   pattern = {
@@ -29,6 +31,7 @@ api.nvim_create_autocmd("BufReadPost", {
   end,
 })
 
+-- Mark .gersemirc* files as yaml syntax
 api.nvim_create_autocmd("BufReadPost", {
   group = augroup("mark_syntax_as_yaml"),
   pattern = {
@@ -39,6 +42,7 @@ api.nvim_create_autocmd("BufReadPost", {
   end,
 })
 
+-- Mark systemd unit files as systemd syntax
 api.nvim_create_autocmd("BufReadPost", {
   group = augroup("mark_syntax_as_systemd"),
   pattern = {
@@ -60,10 +64,31 @@ api.nvim_create_autocmd("BufReadPost", {
   end,
 })
 
+-- Lint file after writing or reading
 api.nvim_create_autocmd({ "BufWritePost", "BufReadPost" }, {
   group = augroup("auto-lint"),
   callback = function()
     require("lint").try_lint()
+  end,
+})
+
+-- Auto-close terminal when process exits
+vim.api.nvim_create_autocmd("TermClose", {
+  group = augroup("terminal"),
+  callback = function()
+    if vim.v.event.status == 0 then
+      vim.api.nvim_buf_delete(0, {})
+    end
+  end,
+})
+
+-- Disable line numbers in terminal
+vim.api.nvim_create_autocmd("TermOpen", {
+  group = augroup("terminal"),
+  callback = function()
+    vim.opt_local.number = false
+    vim.opt_local.relativenumber = false
+    vim.opt_local.signcolumn = "no"
   end,
 })
 
