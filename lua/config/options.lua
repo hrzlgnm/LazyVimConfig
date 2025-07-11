@@ -1,74 +1,102 @@
--- Options are automatically loaded before lazy.nvim startup
--- Default options that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
--- Add any additional options here
+-- much stuff stolen from:
+-- * https://github.com/tjdevries/config.nvim/blob/master/plugin/options.lua
+-- * https://github.com/radleylewis/nvim-lite/blob/master/init.lua
 
--- @todo: redo this per file type like done by tj devries in https://github.com/tjdevries/config.nvim/tree/master/after/ftplugin
-local opt = vim.opt
+local set = vim.opt
 
--- keep line ends as they are
-opt.fileformats = "unix,dos,mac"
+set.fileformats = "unix,dos,mac" -- keep line ends as they are
+set.inccommand = "split" -- show live substitutions in a split window
 
--- stolen from https://github.com/tjdevries/config.nvim/blob/master/plugin/options.lua
-opt.inccommand = "split"
+-- Basic settings
+set.number = true -- Line numbers
+set.relativenumber = true -- Relative line numbers
+set.cursorline = true -- Highlight current line
+set.wrap = true -- Wrap lines
+set.scrolloff = 10 -- Keep 10 lines above/below cursor
+set.sidescrolloff = 8 -- Keep 8 columns left/right of cursor
 
--- Search options
-opt.hlsearch = false
-opt.ignorecase = true
-opt.incsearch = true
-opt.smartcase = true
+-- Indentation
+set.tabstop = 4 -- Tab width
+set.shiftwidth = 4 -- Indent width
+set.softtabstop = 4 -- Soft tab stop
+set.expandtab = true -- Use spaces instead of tabs
+set.smartindent = true -- Smart auto-indenting
+set.autoindent = true -- Copy indent from current line
+set.breakindent = true -- Indent wrapped lines
 
--- personal perference
-opt.relativenumber = true
-opt.number = true
-opt.scrolloff = 10
-opt.sidescrolloff = 8
+-- Search settings
+set.ignorecase = true -- Ignore case in search
+set.smartcase = true -- Smart case sensitivity
+set.hlsearch = false -- Don't highlight search results
+set.incsearch = true -- Show search results as you type
 
-opt.splitbelow = true
-opt.splitright = true
+-- Visual settings
+set.termguicolors = true -- Enable 24-bit colors
+set.signcolumn = "yes" -- Always show sign column
+set.colorcolumn = "100" -- Show column at 100 characters
+set.showmatch = true -- Highlight matching brackets
+set.matchtime = 2 -- How long to show matching bracket
 
-opt.signcolumn = "yes"
-opt.shada = { "'10", "<0", "s10", "h" }
+-- File handling
+set.updatetime = 300 -- Faster completion
+set.timeoutlen = 500 -- Key timeout duration
+set.ttimeoutlen = 0 -- Key code timeout
+set.autoread = true -- Auto reload files changed outside vim
+set.autowrite = false -- Don't auto save
 
-opt.mouse = "a"
-opt.clipboard:append("unnamedplus")
+-- Behavior settings
+set.hidden = true -- Allow hidden buffers
+set.errorbells = false -- No error bells
+set.backspace = "indent,eol,start" -- Better backspace behavior
+set.autochdir = false -- Don't auto change directory
+set.iskeyword:append("-") -- Treat dash as part of word
+set.mouse = "a" -- Enable mouse support
+set.clipboard:append("unnamedplus") -- Use system clipboard
+set.modifiable = true -- Allow buffer modifications
+set.encoding = "UTF-8"
+set.formatoptions:remove("o") -- Don't have `o` add a comment
+set.shada = { "'10", "<0", "s10", "h" }
 
-opt.autoread = true
-opt.autowrite = false
+-- Cursor settings
+set.guicursor =
+  "n-v-c:block,i-ci-ve:block,r-cr:hor20,o:hor50,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor,sm:block-blinkwait175-blinkoff150-blinkon175"
 
--- Don't have `o` add a comment
-opt.formatoptions:remove("o")
+-- Folding settings
+set.foldmethod = "expr" -- Use expression for folding
+set.foldexpr = "nvim_treesitter#foldexpr()" -- Use treesitter for folding
+set.foldlevel = 99 -- Start with all folds open
 
-opt.wrap = true
-opt.shiftwidth = 4
-opt.tabstop = 4
-opt.softtabstop = 4
-opt.expandtab = true
-opt.breakindent = true
-opt.smartindent = true
-opt.autoindent = true
-opt.showbreak = "> "
-opt.linebreak = true
+-- Split behavior
+vim.opt.splitbelow = true -- Horizontal splits go below
+vim.opt.splitright = true -- Vertical splits go right
 
-opt.backspace = "indent,eol,start"
+set.showbreak = "> "
+set.linebreak = true
 
-opt.foldmethod = "marker"
-opt.foldlevel = 0
-opt.modelines = 1
-opt.belloff = "all"
+set.backspace = "indent,eol,start"
 
-opt.joinspaces = true
+set.foldmethod = "marker"
+set.foldlevel = 0
+set.modelines = 1
+set.belloff = "all"
 
-opt.fillchars = { eob = "~" }
+set.joinspaces = true
+
+set.fillchars = { eob = "~" }
+
 -- Ignore compiled files
-opt.wildignore = "__pycache__"
-opt.wildignore:append({ "*.o", "*~", "*.pyc", "*pycache*" })
+set.wildignore = "__pycache__"
+set.wildignore:append({ "*.o", "*~", "*.pyc", "*pycache*" })
 
 -- Floating window popup for completion on command line
-opt.pumblend = 17
-opt.wildmode = "longest:full"
-opt.wildoptions = "pum"
+set.pumblend = 17
+set.wildmode = "longest:full"
+set.wildoptions = "pum"
 
-opt.updatetime = 1000
+-- Performance improvements
+set.updatetime = 1000
+set.redrawtime = 10000
+set.maxmempattern = 20000
 
 -- Make some some providers shut up
 local g = vim.g
