@@ -19,9 +19,6 @@ local function get_opts()
 end
 
 return {
-  "williamboman/mason.nvim",
-  cmd = {
-    "Mason",
-  },
+  "mason-org/mason.nvim",
   opts = get_opts(),
 }
