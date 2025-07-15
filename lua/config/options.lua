@@ -52,7 +52,6 @@ set.autochdir = false -- Don't auto change directory
 set.iskeyword:append("-") -- Treat dash as part of word
 set.mouse = "a" -- Enable mouse support
 set.clipboard:append("unnamedplus") -- Use system clipboard
-set.modifiable = true -- Allow buffer modifications
 set.encoding = "UTF-8"
 set.formatoptions:remove("o") -- Don't have `o` add a comment
 set.shada = { "'10", "<0", "s10", "h" }
