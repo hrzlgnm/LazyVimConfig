@@ -56,10 +56,6 @@ set.encoding = "UTF-8"
 set.formatoptions:remove("o") -- Don't have `o` add a comment
 set.shada = { "'10", "<0", "s10", "h" }
 
--- Cursor settings
-set.guicursor =
-  "n-v-c:block,i-ci-ve:block,r-cr:hor20,o:hor50,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor,sm:block-blinkwait175-blinkoff150-blinkon175"
-
 -- Folding settings
 set.foldmethod = "expr" -- Use expression for folding
 set.foldexpr = "nvim_treesitter#foldexpr()" -- Use treesitter for folding
