@@ -102,6 +102,3 @@ g.python3_host_prog = "/usr/bin/python3"
 
 -- Map localleader to ,
 g.maplocalleader = ","
-
--- Use main brach of blink to avoid crashes
-g.lazyvim_blink_main = true
