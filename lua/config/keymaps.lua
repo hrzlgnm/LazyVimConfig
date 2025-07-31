@@ -16,8 +16,7 @@ local function map(mode, lhs, rhs, opts)
   end
 end
 
-map("n", "<leader>o", ":update<CR> :source<CR>", { desc = "Update and s[o]ource current file" })
-map("n", "<leader>w", ":write<CR>", { desc = "[W]rite current file" })
+map("n", "<leader>so", ":update<CR> :source<CR>", { desc = "[S]hout [o]ut the current file" })
 map("n", "<leader>q", ":quit<CR>", { desc = "[Q]uit" })
 
 -- yank everything between { } including {}
