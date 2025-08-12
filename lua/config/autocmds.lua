@@ -72,23 +72,30 @@ api.nvim_create_autocmd({ "BufWritePost", "BufReadPost" }, {
   end,
 })
 
--- Auto-close terminal when process exits
+-- Auto-close terminal when process exits cleanly
 vim.api.nvim_create_autocmd("TermClose", {
-  group = augroup("terminal"),
-  callback = function()
+  group = augroup("AutoCloseTerminal"),
+  callback = function(args)
     if vim.v.event.status == 0 then
-      vim.api.nvim_buf_delete(0, {})
+      -- Defer so it runs after TermClose finishes
+      vim.schedule(function()
+        if vim.api.nvim_buf_is_valid(args.buf) then
+          vim.api.nvim_buf_delete(args.buf, { force = true })
+        end
+      end)
     end
   end,
 })
 
--- Disable line numbers in terminal
+-- Disable line numbers in terminal and enter insert
+-- mode to automatically follow the cursor
 vim.api.nvim_create_autocmd("TermOpen", {
-  group = augroup("terminal"),
+  group = augroup("DisalbeLineNumbersInTerminalAndEnterInsertMode"),
   callback = function()
     vim.opt_local.number = false
     vim.opt_local.relativenumber = false
     vim.opt_local.signcolumn = "no"
+    vim.cmd("startinsert")
   end,
 })
 
