@@ -79,3 +79,6 @@ map("v", ">", ">gv", { desc = "Indent right and reselect" })
 
 -- Better J behavior
 map("n", "J", "mzJ`z", { desc = "Join lines and keep cursor position" })
+
+-- Best ever backspace
+map({ "c", "i" }, "<Backspace>", "<C-w>")
