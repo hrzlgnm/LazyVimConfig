@@ -31,11 +31,13 @@ map(
   { desc = "Select and sort cmake sortable list range" }
 )
 
+--[[ fixme
 local ts_repeat_move = require("nvim-treesitter.textobjects.repeatable_move")
 
 -- vim way: ; goes to the direction you were moving.
 map({ "n", "x", "o" }, ";", ts_repeat_move.repeat_last_move)
 map({ "n", "x", "o" }, ",", ts_repeat_move.repeat_last_move_opposite)
+]]
 
 -- Normal mode mappings
 map("n", "<leader>c", ":nohlsearch<CR>", { desc = "Clear search highlights" })

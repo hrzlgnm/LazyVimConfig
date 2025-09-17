@@ -1,8 +1,9 @@
 return {
-  "nvim-treesitter/nvim-treesitter",
+  "nvim-treesitter/nvim-treesitter-textobjects",
+}
+--[[ fixme: enable later
+return {
   dependencies = {
-    "nvim-treesitter/playground",
-    "nvim-treesitter/nvim-treesitter-textobjects",
   },
   config = function()
     local configs = require("nvim-treesitter.configs")
@@ -148,3 +149,5 @@ return {
     })
   end,
 }
+]]
+--
