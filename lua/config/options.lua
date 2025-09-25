@@ -59,7 +59,7 @@ set.shada = { "'10", "<0", "s10", "h" }
 -- Folding settings
 set.foldmethod = "expr" -- Use expression for folding
 set.foldexpr = "nvim_treesitter#foldexpr()" -- Use treesitter for folding
-set.foldlevel = 99 -- Start with all folds open
+set.foldenable = false
 
 -- Split behavior
 vim.opt.splitbelow = true -- Horizontal splits go below
