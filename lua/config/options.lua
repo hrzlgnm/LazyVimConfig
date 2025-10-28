@@ -68,30 +68,16 @@ vim.opt.splitright = true -- Vertical splits go right
 set.showbreak = "> "
 set.linebreak = true
 
-set.backspace = "indent,eol,start"
-
 set.foldmethod = "marker"
 set.foldlevel = 0
 set.modelines = 1
-set.belloff = "all"
 
 set.joinspaces = true
-
-set.fillchars = { eob = "~" }
-
--- Ignore compiled files
-set.wildignore = "__pycache__"
-set.wildignore:append({ "*.o", "*~", "*.pyc", "*pycache*" })
 
 -- Floating window popup for completion on command line
 set.pumblend = 17
 set.wildmode = "longest:full"
 set.wildoptions = "pum"
-
--- Performance improvements
-set.updatetime = 1000
-set.redrawtime = 10000
-set.maxmempattern = 20000
 
 -- Make some some providers shut up
 local g = vim.g
