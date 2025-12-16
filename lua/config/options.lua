@@ -88,3 +88,6 @@ g.python3_host_prog = "/usr/bin/python3"
 
 -- Map localleader to ,
 g.maplocalleader = ","
+
+-- enable codebook lsp
+vim.lsp.enable("codebook")
