@@ -102,12 +102,6 @@ vim.api.nvim_create_autocmd("TermOpen", {
 --- cmake sort magic
 local get_node_text = vim.treesitter.get_node_text
 
-local function select_sortable_range(bufnr, line, col, end_line, end_col)
-  api.nvim_buf_set_mark(bufnr, "<", line + 1, col, {})
-  api.nvim_buf_set_mark(bufnr, ">", end_line + 1, end_col - 1, {})
-  vim.cmd([[normal! gv]])
-end
-
 -- @todo perhaps consider using utf8 aware string compare
 local function is_strictly_sorted_ascending_nocase(tbl)
   for i = 1, #tbl - 1 do
@@ -130,26 +124,24 @@ local function filter_out_sorted_and_dropped_and_flatten(tbl)
   return flat
 end
 
-local special_keywords = { "INTERFACE", "PUBLIC", "PRIVATE" }
+local special_keywords = {
+  "INTERFACE",
+  "PUBLIC",
+  "PRIVATE",
+  "OPTIONAL",
+  "REQUIRED",
+  "OBJECT",
+  "LINK_PRIVATE",
+  "LINK_PUBLIC",
+  "STATIC",
+  "SHARED",
+  "MODULE",
+  "OBJECT",
+  "EXCLUDE_FROM_ALL",
+}
 
 -- @todo: support more commands line add_library or add_executable and list like set
 local function cmake_select_first_sortable_range()
-  local query = vim.treesitter.query.parse(
-    "cmake",
-    [[
-    ; matches all args inside a normal command target_sources
-    (normal_command
-      (identifier) @command_name
-      (argument_list (argument)+ @argument)
-    (#eq? @command_name "target_sources"))
-    ; matches all args inside a normal command target_link_libraries
-    (normal_command
-      (identifier) @command_name
-      (argument_list (argument)+ @argument)
-    (#eq? @command_name "target_link_libraries"))
-]]
-  )
-
   local bufnr = api.nvim_get_current_buf()
   local parser = vim.treesitter.get_parser(bufnr, "cmake")
   if parser == nil then
@@ -159,6 +151,17 @@ local function cmake_select_first_sortable_range()
   if parsed == nil then
     return
   end
+
+  local query = vim.treesitter.query.parse(
+    "cmake",
+    [[
+    (normal_command
+      (identifier) @command_name
+      (argument_list (argument)+ @argument)
+    (#any-of? @command_name "target_sources" "target_link_libraries" "target_compile_options" "target_include_directories" "add_library" "add_executable" "set_target_properties"))
+    ]]
+  )
+
   local tree = parsed[1]
   local root = tree:root()
   local all_sortables = {}
@@ -169,22 +172,28 @@ local function cmake_select_first_sortable_range()
       if capture_name == "argument" then
         for _, node in ipairs(nodes) do
           local argument_value = get_node_text(node, bufnr)
-          -- mark target or special_keywords as dropped
-          if #sortables == 0 or vim.tbl_contains(special_keywords, argument_value) then
-            table.insert(sortables, { dropped = true })
-          else
-            local range = { node:range() }
-            local last = sortables[#sortables]
-            if not last.dropped then
-              -- extend range end_line and end_col
-              last.range[3] = range[3]
-              last.range[4] = range[4]
-              -- add value
-              table.insert(last.args, argument_value)
-            else
-              -- begin a new range
-              table.insert(sortables, { range = range, args = { argument_value } })
+          local range = { node:range() }
+          local last = sortables[#sortables]
+
+          local is_special = vim.tbl_contains(special_keywords, argument_value)
+          local is_consecutive = false
+          if last and last.range then
+            local last_end_row, last_end_col = last.range[3], last.range[4]
+            local curr_start_row, curr_start_col = range[1], range[2]
+            if not last.dropped and last_end_row > 0 and last_end_col > 0 then
+              is_consecutive = (curr_start_row == last_end_row and curr_start_col > last_end_col)
+                or (curr_start_row == last_end_row + 1)
             end
+          end
+
+          if #sortables == 0 or is_special then
+            table.insert(sortables, { dropped = true })
+          elseif is_consecutive then
+            last.range[3] = range[3]
+            last.range[4] = range[4]
+            table.insert(last.args, argument_value)
+          else
+            table.insert(sortables, { range = range, args = { argument_value } })
           end
         end
       end
@@ -194,9 +203,28 @@ local function cmake_select_first_sortable_range()
 
   local sortable = filter_out_sorted_and_dropped_and_flatten(all_sortables)
 
+  if #sortable == 0 then
+    return
+  end
+
+  local cursor = api.nvim_win_get_cursor(0)
+  local cursor_line = cursor[1] - 1
+
+  local best_match = nil
+  local best_distance = math.huge
   for _, r in ipairs(sortable) do
-    select_sortable_range(bufnr, unpack(r.range))
-    break
+    local range_start = r.range[1]
+    local distance = math.abs(range_start - cursor_line)
+    if distance < best_distance then
+      best_distance = distance
+      best_match = r
+    end
+  end
+
+  if best_match then
+    local start_line = best_match.range[1] + 1
+    local end_line = best_match.range[3] + 1
+    vim.cmd(string.format("%d,%dsort iu", start_line, end_line))
   end
 end
 

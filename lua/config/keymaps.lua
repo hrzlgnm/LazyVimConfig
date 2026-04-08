@@ -27,8 +27,8 @@ map("x", "<leader>p", [["_d"+P]], { desc = "Paste selected text over current sel
 map(
   "n",
   "<m-y>",
-  [[<cmd>CMakeSelectFirstSortableRange<CR><cmd>'<,'>Sort iu<CR><Esc>]],
-  { desc = "Select and sort cmake sortable list range" }
+  [[<cmd>CMakeSelectFirstSortableRange<CR>]],
+  { desc = "Sort cmake sortable list range" }
 )
 
 --[[ fixme
