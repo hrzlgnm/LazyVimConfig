@@ -140,7 +140,11 @@ local special_keywords = {
   "EXCLUDE_FROM_ALL",
 }
 
--- @todo: support more commands line add_library or add_executable and list like set
+local drop_first_arg_commands = {
+  set = 1,
+  list = 2,
+}
+
 local function cmake_select_first_sortable_range()
   local bufnr = api.nvim_get_current_buf()
   local parser = vim.treesitter.get_parser(bufnr, "cmake")
@@ -158,7 +162,7 @@ local function cmake_select_first_sortable_range()
     (normal_command
       (identifier) @command_name
       (argument_list (argument)+ @argument)
-    (#any-of? @command_name "target_sources" "target_link_libraries" "target_compile_options" "target_include_directories" "add_library" "add_executable" "set_target_properties"))
+    (#any-of? @command_name "target_sources" "target_link_libraries" "target_compile_options" "target_include_directories" "add_library" "add_executable" "set_target_properties" "set" "list"))
     ]]
   )
 
@@ -167,9 +171,13 @@ local function cmake_select_first_sortable_range()
   local all_sortables = {}
   for _, matches, _ in query:iter_matches(root, bufnr, 0, -1, { all = true }) do
     local sortables = {}
+    local drop_count = 0
     for id, nodes in pairs(matches) do
       local capture_name = query.captures[id]
-      if capture_name == "argument" then
+      if capture_name == "command_name" then
+        local cmd_name = get_node_text(nodes[1], bufnr)
+        drop_count = drop_first_arg_commands[cmd_name] or 0
+      elseif capture_name == "argument" then
         for _, node in ipairs(nodes) do
           local argument_value = get_node_text(node, bufnr)
           local range = { node:range() }
@@ -186,7 +194,8 @@ local function cmake_select_first_sortable_range()
             end
           end
 
-          if #sortables == 0 or is_special then
+          local should_drop = #sortables < drop_count
+          if should_drop or is_special then
             table.insert(sortables, { dropped = true })
           elseif is_consecutive then
             last.range[3] = range[3]
