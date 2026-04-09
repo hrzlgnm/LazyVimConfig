@@ -217,10 +217,6 @@ local function cmake_select_first_sortable_range()
 
   local sortable = filter_out_sorted_and_dropped_and_flatten(all_sortables)
 
-  if #sortable == 0 then
-    return
-  end
-
   local cursor = api.nvim_win_get_cursor(0)
   local cursor_line = cursor[1] - 1
 
@@ -265,5 +261,117 @@ local function cmake_select_first_sortable_range()
     end
   end
 end
+
+api.nvim_create_user_command("CMakeSortAll", function()
+  local bufnr = api.nvim_get_current_buf()
+  local parser = vim.treesitter.get_parser(bufnr, "cmake")
+  if parser == nil then
+    return
+  end
+  local parsed = parser:parse()
+  if parsed == nil then
+    return
+  end
+
+  local query = vim.treesitter.query.parse(
+    "cmake",
+    [[
+    (normal_command
+      (identifier) @command_name
+      (argument_list (argument)+ @argument)
+    (#any-of? @command_name "target_sources" "target_link_libraries" "target_compile_options" "target_include_directories" "add_library" "add_executable" "set_target_properties" "set" "list"))
+    ]]
+  )
+
+  local tree = parsed[1]
+  local root = tree:root()
+  local all_sortables = {}
+  for _, matches, _ in query:iter_matches(root, bufnr, 0, -1, { all = true }) do
+    local sortables = {}
+    local drop_count = 0
+    local cmd_name = nil
+    for id, nodes in pairs(matches) do
+      local capture_name = query.captures[id]
+      if capture_name == "command_name" then
+        cmd_name = get_node_text(nodes[1], bufnr)
+        drop_count = drop_first_arg_commands[cmd_name] or 0
+      elseif capture_name == "argument" then
+        for _, node in ipairs(nodes) do
+          local argument_value = get_node_text(node, bufnr)
+          local range = { node:range() }
+          local last = sortables[#sortables]
+
+          local is_special = vim.tbl_contains(special_keywords, argument_value)
+          local is_consecutive = false
+          if last and last.range then
+            local last_end_row, last_end_col = last.range[3], last.range[4]
+            local curr_start_row, curr_start_col = range[1], range[2]
+            if not last.dropped and last_end_row > 0 and last_end_col > 0 then
+              is_consecutive = (curr_start_row == last_end_row and curr_start_col > last_end_col)
+                or (curr_start_row == last_end_row + 1)
+            end
+          end
+
+          local should_drop = #sortables < drop_count
+          if should_drop or is_special then
+            table.insert(sortables, { dropped = true })
+          elseif is_consecutive then
+            last.range[3] = range[3]
+            last.range[4] = range[4]
+            table.insert(last.args, argument_value)
+          else
+            table.insert(sortables, { range = range, args = { argument_value } })
+          end
+        end
+      end
+    end
+    table.insert(all_sortables, { cmd = cmd_name, sortables = sortables })
+  end
+
+  local sortable = filter_out_sorted_and_dropped_and_flatten(all_sortables)
+
+  local changes = {}
+  for _, r in ipairs(sortable) do
+    local start_line = r.range[1] + 1
+    local end_line = r.range[3] + 1
+    local start_col = r.range[2]
+    local end_col = r.range[4]
+
+    local is_single_line = start_line == end_line
+    local use_word_sort = is_single_line and single_line_sort_commands[r.cmd]
+
+    table.insert(changes, {
+      start_line = start_line,
+      end_line = end_line,
+      start_col = start_col,
+      end_col = end_col,
+      use_word_sort = use_word_sort,
+    })
+  end
+
+  for i = #changes, 1, -1 do
+    local c = changes[i]
+    if c.use_word_sort then
+      local lines = vim.api.nvim_buf_get_lines(bufnr, c.start_line - 1, c.end_line, false)
+      local line = lines[1]
+      local prefix = line:sub(1, c.start_col)
+      local suffix = line:sub(c.end_col + 1)
+      local middle = line:sub(c.start_col + 1, c.end_col)
+
+      local words = {}
+      for word in middle:gmatch("%S+") do
+        table.insert(words, word)
+      end
+      table.sort(words, function(a, b) return a:lower() < b:lower() end)
+
+      local sorted_line = prefix .. table.concat(words, " ") .. suffix
+      vim.api.nvim_buf_set_lines(bufnr, c.start_line - 1, c.end_line, false, { sorted_line })
+    else
+      vim.cmd(string.format("%d,%dsort iu", c.start_line, c.end_line))
+    end
+  end
+
+  vim.notify(string.format("Sorted %d ranges", #changes), vim.log.levels.INFO)
+end, {})
 
 api.nvim_create_user_command("CMakeSelectFirstSortableRange", cmake_select_first_sortable_range, {})
