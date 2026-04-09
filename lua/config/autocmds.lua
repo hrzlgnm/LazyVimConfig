@@ -102,7 +102,6 @@ vim.api.nvim_create_autocmd("TermOpen", {
 --- cmake sort magic
 local get_node_text = vim.treesitter.get_node_text
 
--- @todo perhaps consider using utf8 aware string compare
 local function is_strictly_sorted_ascending_nocase(tbl)
   for i = 1, #tbl - 1 do
     if tbl[i]:lower() >= tbl[i + 1]:lower() then
@@ -114,10 +113,10 @@ end
 
 local function filter_out_sorted_and_dropped_and_flatten(tbl)
   local flat = {}
-  for _, outer in ipairs(tbl) do
-    for _, inner in ipairs(outer) do
+  for _, entry in ipairs(tbl) do
+    for _, inner in ipairs(entry.sortables) do
       if not inner.dropped and not is_strictly_sorted_ascending_nocase(inner.args) then
-        table.insert(flat, inner)
+        table.insert(flat, { range = inner.range, args = inner.args, cmd = entry.cmd })
       end
     end
   end
@@ -143,6 +142,11 @@ local special_keywords = {
 local drop_first_arg_commands = {
   set = 1,
   list = 2,
+}
+
+local single_line_sort_commands = {
+  set = true,
+  list = true,
 }
 
 local function cmake_select_first_sortable_range()
@@ -172,10 +176,11 @@ local function cmake_select_first_sortable_range()
   for _, matches, _ in query:iter_matches(root, bufnr, 0, -1, { all = true }) do
     local sortables = {}
     local drop_count = 0
+    local cmd_name = nil
     for id, nodes in pairs(matches) do
       local capture_name = query.captures[id]
       if capture_name == "command_name" then
-        local cmd_name = get_node_text(nodes[1], bufnr)
+        cmd_name = get_node_text(nodes[1], bufnr)
         drop_count = drop_first_arg_commands[cmd_name] or 0
       elseif capture_name == "argument" then
         for _, node in ipairs(nodes) do
@@ -207,7 +212,7 @@ local function cmake_select_first_sortable_range()
         end
       end
     end
-    table.insert(all_sortables, sortables)
+    table.insert(all_sortables, { cmd = cmd_name, sortables = sortables })
   end
 
   local sortable = filter_out_sorted_and_dropped_and_flatten(all_sortables)
@@ -233,7 +238,31 @@ local function cmake_select_first_sortable_range()
   if best_match then
     local start_line = best_match.range[1] + 1
     local end_line = best_match.range[3] + 1
-    vim.cmd(string.format("%d,%dsort iu", start_line, end_line))
+    local start_col = best_match.range[2]
+    local end_col = best_match.range[4]
+
+    local is_single_line = start_line == end_line
+    local use_word_sort = is_single_line and single_line_sort_commands[best_match.cmd]
+
+    if use_word_sort then
+      local lines = vim.api.nvim_buf_get_lines(bufnr, start_line - 1, end_line, false)
+      local line = lines[1]
+
+      local prefix = line:sub(1, start_col)
+      local suffix = line:sub(end_col + 1)
+      local middle = line:sub(start_col + 1, end_col)
+
+      local words = {}
+      for word in middle:gmatch("%S+") do
+        table.insert(words, word)
+      end
+      table.sort(words, function(a, b) return a:lower() < b:lower() end)
+
+      local sorted_line = prefix .. table.concat(words, " ") .. suffix
+      vim.api.nvim_buf_set_lines(bufnr, start_line - 1, end_line, false, { sorted_line })
+    else
+      vim.cmd(string.format("%d,%dsort iu", start_line, end_line))
+    end
   end
 end
 
