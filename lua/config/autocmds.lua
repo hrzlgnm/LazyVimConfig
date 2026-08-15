@@ -137,6 +137,7 @@ local special_keywords = {
   "MODULE",
   "OBJECT",
   "EXCLUDE_FROM_ALL",
+  "PROPERTIES",
 }
 
 local drop_first_arg_commands = {
