@@ -1,6 +1,6 @@
 return {
-  "https://github.com/vague2k/vague.nvim",
-  config = function()
-    require("vague").setup({ transparent = true })
-  end,
+  "vague2k/vague.nvim",
+  lazy = false,
+  priority = 1000,
+  opts = { transparent = true },
 }

@@ -8,8 +8,6 @@ set.fileformats = "unix,dos,mac" -- keep line ends as they are
 set.inccommand = "split" -- show live substitutions in a split window
 
 -- Basic settings
-set.number = true -- Line numbers
-set.relativenumber = true -- Relative line numbers
 set.cursorline = true -- Highlight current line
 set.wrap = true -- Wrap lines
 set.scrolloff = 10 -- Keep 10 lines above/below cursor
@@ -25,14 +23,10 @@ set.autoindent = true -- Copy indent from current line
 set.breakindent = true -- Indent wrapped lines
 
 -- Search settings
-set.ignorecase = true -- Ignore case in search
-set.smartcase = true -- Smart case sensitivity
 set.hlsearch = false -- Don't highlight search results
 set.incsearch = true -- Show search results as you type
 
 -- Visual settings
-set.termguicolors = true -- Enable 24-bit colors
-set.signcolumn = "yes" -- Always show sign column
 set.colorcolumn = "100" -- Show column at 100 characters
 set.showmatch = true -- Highlight matching brackets
 set.matchtime = 2 -- How long to show matching bracket
@@ -41,34 +35,21 @@ set.matchtime = 2 -- How long to show matching bracket
 set.updatetime = 300 -- Faster completion
 set.timeoutlen = 500 -- Key timeout duration
 set.ttimeoutlen = 0 -- Key code timeout
-set.autoread = true -- Auto reload files changed outside vim
 set.autowrite = false -- Don't auto save
 
 -- Behavior settings
-set.hidden = true -- Allow hidden buffers
-set.errorbells = false -- No error bells
-set.backspace = "indent,eol,start" -- Better backspace behavior
 set.autochdir = false -- Don't auto change directory
 set.iskeyword:append("-") -- Treat dash as part of word
-set.mouse = "a" -- Enable mouse support
-set.clipboard:append("unnamedplus") -- Use system clipboard
-set.encoding = "UTF-8"
 set.formatoptions:remove("o") -- Don't have `o` add a comment
 set.shada = { "'10", "<0", "s10", "h" }
 
 -- Folding settings
-set.foldmethod = "expr" -- Use expression for folding
-set.foldexpr = "nvim_treesitter#foldexpr()" -- Use treesitter for folding
 set.foldenable = false
-
--- Split behavior
-vim.opt.splitbelow = true -- Horizontal splits go below
-vim.opt.splitright = true -- Vertical splits go right
 
 set.showbreak = "> "
 set.linebreak = true
 
-set.foldmethod = "marker"
+set.foldmethod = "marker" -- Use {{{ }}} markers for folding
 set.foldlevel = 0
 set.modelines = 1
 
@@ -91,3 +72,28 @@ g.maplocalleader = ","
 
 -- enable codebook lsp
 vim.lsp.enable("codebook")
+
+-- Filetype detection for files nvim does not recognize on its own
+vim.filetype.add({
+  extension = {
+    jenkinsfile = "groovy",
+    automount = "systemd",
+    device = "systemd",
+    link = "systemd",
+    mount = "systemd",
+    network = "systemd",
+    scope = "systemd",
+    service = "systemd",
+    slice = "systemd",
+    socket = "systemd",
+    swap = "systemd",
+    target = "systemd",
+    timer = "systemd",
+  },
+  pattern = {
+    ["diloconboard.*%.conf"] = "dosini",
+    ["compy.*%.conf.*"] = "dosini",
+    ["Jenkinsfile.*"] = "groovy",
+    ["%.gersemirc.*"] = "yaml",
+  },
+})
