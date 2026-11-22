@@ -77,7 +77,6 @@ vim.lsp.enable("codebook")
 -- Filetype detection for files nvim does not recognize on its own
 vim.filetype.add({
   extension = {
-    jenkinsfile = "groovy",
     automount = "systemd",
     device = "systemd",
     link = "systemd",
@@ -94,7 +93,6 @@ vim.filetype.add({
   pattern = {
     ["diloconboard.*%.conf"] = "dosini",
     ["compy.*%.conf.*"] = "dosini",
-    ["Jenkinsfile.*"] = "groovy",
     ["%.gersemirc.*"] = "yaml",
   },
 })
