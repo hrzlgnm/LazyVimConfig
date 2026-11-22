@@ -1,8 +1,5 @@
 local set = vim.opt_local
 
-set.textwidth = 88
-set.tabstop = 4
-set.softtabstop = 4
-set.shiftwidth = 4
-set.expandtab = true
+set.textwidth = 88 -- black's line length
+set.tabstop = 4 -- runtime ftplugin sets 8
 set.colorcolumn = "+1"

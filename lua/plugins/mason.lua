@@ -9,7 +9,6 @@ return {
       "hadolint",
       "language-server-bitbake",
       "shellcheck",
-      "shellharden",
       "shfmt",
       "stylua",
     },

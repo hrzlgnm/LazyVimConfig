@@ -8,23 +8,17 @@ set.fileformats = "unix,dos,mac" -- keep line ends as they are
 set.inccommand = "split" -- show live substitutions in a split window
 
 -- Basic settings
-set.cursorline = true -- Highlight current line
 set.wrap = true -- Wrap lines
 set.scrolloff = 10 -- Keep 10 lines above/below cursor
-set.sidescrolloff = 8 -- Keep 8 columns left/right of cursor
 
 -- Indentation
 set.tabstop = 4 -- Tab width
 set.shiftwidth = 4 -- Indent width
 set.softtabstop = 4 -- Soft tab stop
-set.expandtab = true -- Use spaces instead of tabs
-set.smartindent = true -- Smart auto-indenting
-set.autoindent = true -- Copy indent from current line
 set.breakindent = true -- Indent wrapped lines
 
 -- Search settings
 set.hlsearch = false -- Don't highlight search results
-set.incsearch = true -- Show search results as you type
 
 -- Visual settings
 set.colorcolumn = "100" -- Show column at 100 characters
@@ -38,10 +32,8 @@ set.ttimeoutlen = 0 -- Key code timeout
 set.autowrite = false -- Don't auto save
 
 -- Behavior settings
-set.autochdir = false -- Don't auto change directory
 set.exrc = true -- Load trusted .nvim.lua/.nvimrc/.exrc from cwd and parents (see :trust)
 set.iskeyword:append("-") -- Treat dash as part of word
-set.formatoptions:remove("o") -- Don't have `o` add a comment
 set.shada = { "'10", "<0", "s10", "h" }
 
 -- Folding settings
@@ -95,4 +87,13 @@ vim.filetype.add({
     ["compy.*%.conf.*"] = "dosini",
     ["%.gersemirc.*"] = "yaml",
   },
+})
+
+-- Don't continue comments with o/O. Filetype plugins reset 'formatoptions',
+-- so this has to run per buffer.
+vim.api.nvim_create_autocmd("FileType", {
+  group = vim.api.nvim_create_augroup("user_no_comment_on_o", { clear = true }),
+  callback = function()
+    vim.opt_local.formatoptions:remove("o")
+  end,
 })

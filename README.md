@@ -21,12 +21,12 @@ Enabled through `lazyvim.json` (manage with `:LazyExtras`):
 |---|---|
 | Languages | clangd, cmake, rust, typescript, svelte, python, sql, docker, json, yaml, toml, markdown, git |
 | Formatting / linting | prettier, eslint, black |
-| Editor | snacks picker + explorer, mini-files, harpoon2, refactoring, inc-rename, navic, illuminate, dial, mini-move, mini-diff |
+| Editor | snacks picker + explorer, mini-files, harpoon2, refactoring, inc-rename, dial, mini-move, mini-diff |
 | Coding | yanky, mini-surround, neogen |
 | Debug / test | dap.core, test.core |
 | AI | copilot, copilot-chat |
 | UI | indent-blankline, treesitter-context, mini-animate, smear-cursor |
-| Util | chezmoi, dot, mini-hipatterns, neoconf |
+| Util | chezmoi, dot, mini-hipatterns |
 
 ## Custom plugins and overrides (`lua/plugins/`)
 
@@ -38,12 +38,12 @@ Enabled through `lazyvim.json` (manage with `:LazyExtras`):
 | `cmake-tools.lua` | Ninja generator, `build/` dir, symlinked `compile_commands.json` |
 | `fude.lua` | [fude.nvim](https://github.com/flexphere/fude.nvim) GitHub PR review, keys under `<leader>gr` |
 | `nvim-lint.lua` | extra linters: `oelint-adv` (bitbake), `systemdlint` (systemd) |
-| `conform.lua` | `shfmt` with 4-space indent |
-| `mason.lua` | additional tools (shell, clang-format, gersemi, hadolint, codebook, …) |
+| `conform.lua` | `gersemi` for CMake, `shfmt` with 4-space indent |
+| `mason.lua` | additional tools (bash-language-server, shellcheck, shfmt, clang-format, gersemi, hadolint, codebook, …) |
 | `snacks.lua` | images on, smooth scrolling off |
 | `sort.lua` | [sort.nvim](https://github.com/sQVe/sort.nvim) without `:` as delimiter (CMake targets) |
-| `suda.lua` | `:SudaWrite` / `:SudaRead` for root-owned files |
-| `rainbow_cvs.lua` | column colouring for CSV/TSV |
+| `suda.lua` | smart edit: root-owned files open/save via sudo automatically |
+| `rainbow_csv.lua` | column colouring for CSV/TSV |
 
 ## Keymaps
 
@@ -72,5 +72,6 @@ Only additions on top of the [LazyVim defaults](https://www.lazyvim.org/keymaps)
   `*.network`, …) anywhere, `.gersemirc*` as YAML, a few board configs as `dosini`.
 - **Terminals** start in insert mode without line numbers and close when the process exits
   cleanly.
+- **`o`/`O` do not continue comments** in any filetype.
 - **Folding** uses `{{{ }}}` markers and is off by default.
 - Per-language indentation lives in `after/ftplugin/`.
