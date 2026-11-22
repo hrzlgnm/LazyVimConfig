@@ -39,6 +39,7 @@ set.autowrite = false -- Don't auto save
 
 -- Behavior settings
 set.autochdir = false -- Don't auto change directory
+set.exrc = true -- Load trusted .nvim.lua/.nvimrc/.exrc from cwd and parents (see :trust)
 set.iskeyword:append("-") -- Treat dash as part of word
 set.formatoptions:remove("o") -- Don't have `o` add a comment
 set.shada = { "'10", "<0", "s10", "h" }
