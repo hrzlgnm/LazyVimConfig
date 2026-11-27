@@ -260,18 +260,29 @@ local function append_existing(lines, command, sources, edits)
   end
 
   local close_row, close_col = closing_paren(lines, args[#args].node:parent())
+  local insert = { "" }
+  for _, line in ipairs(insertion_lines(sources, indent)) do
+    table.insert(insert, line)
+  end
+
   if close_row == range[3] then
-    local insert = { "" }
-    for _, line in ipairs(insertion_lines(sources, indent)) do
-      table.insert(insert, line)
-    end
-    table.insert(insert, leading_indent(lines[command.node:start() + 1]))
+    -- Keep the closing paren on the last inserted source line.
     table.insert(edits, { row = close_row, col = close_col, end_row = close_row, end_col = close_col, lines = insert })
+    return
+  end
+
+  local closer = lines[close_row + 1]
+  local last_line_clean = lines[range[3] + 1]:sub(range[4] + 1):match("^%s*$") ~= nil
+  if closer and closer:match("^%s*%)%s*$") and last_line_clean then
+    insert[#insert] = insert[#insert] .. ")"
+    table.insert(edits, {
+      row = range[3],
+      col = range[4],
+      end_row = close_row,
+      end_col = #closer,
+      lines = insert,
+    })
   else
-    local insert = { "" }
-    for _, line in ipairs(insertion_lines(sources, indent)) do
-      table.insert(insert, line)
-    end
     table.insert(edits, {
       row = range[3],
       col = range[4],
@@ -292,7 +303,7 @@ local function insert_new(bufnr, lines, target, command, sources, edits)
   for _, source in ipairs(sources) do
     table.insert(insert, indent .. "        " .. source)
   end
-  table.insert(insert, indent .. ")")
+  insert[#insert] = insert[#insert] .. ")"
   table.insert(insert, "")
 
   local end_row = select(1, command.node:end_())
@@ -314,6 +325,70 @@ local function insert_new(bufnr, lines, target, command, sources, edits)
     })
   else
     table.insert(edits, { row = row, col = 0, end_row = row, end_col = 0, lines = insert })
+  end
+end
+
+--- Fold a leftover standalone closing paren onto the last remaining line.
+local function merge_closer_edit(lines, command, sources, edits)
+  local start_row = select(1, command.node:start())
+  local end_row = select(1, command.node:end_())
+  local closer = lines[end_row + 1]
+  if closer == nil or closer:match("^%s*%)%s*$") == nil then
+    return
+  end
+
+  local removed = {}
+  for _, source in ipairs(sources) do
+    removed[source.range[1]] = true
+  end
+  local previous = end_row - 1
+  while previous > start_row and removed[previous] do
+    previous = previous - 1
+  end
+  local previous_line = lines[previous + 1]
+  if previous_line == nil or not previous_line:match("%S") or previous_line:gsub("^%s*", ""):sub(1, 1) == "#" then
+    return
+  end
+  for row = previous + 1, end_row - 1 do
+    if not removed[row] and lines[row + 1]:match("^%s*$") == nil then
+      return
+    end
+  end
+
+  local trimmed = previous_line:gsub("%s+$", "")
+  table.insert(edits, { row = previous, col = #trimmed, end_row = end_row, end_col = #closer, lines = { ")" } })
+end
+
+--- Fallback for blocks where the closer was left alone on its line.
+local function join_standalone_closers(bufnr, targets)
+  local commands = collect(bufnr)
+  if not commands then
+    return
+  end
+  local lines = api.nvim_buf_get_lines(bufnr, 0, -1, false)
+  local edits = {}
+  for _, command in ipairs(commands) do
+    local row = select(1, command.node:end_())
+    local closer = lines[row + 1]
+    local previous = row > 0 and lines[row] or nil
+    if
+      command.args[1]
+      and targets[command.args[1].text]
+      and closer
+      and previous
+      and closer:match("^%s*%)%s*$")
+      and previous:match("%S")
+      and previous:gsub("^%s*", ""):sub(1, 1) ~= "#"
+    then
+      local trimmed = previous:gsub("%s+$", "")
+      table.insert(edits, { row = row - 1, col = #trimmed, end_row = row, end_col = #closer, lines = { ")" } })
+    end
+  end
+  table.sort(edits, function(a, b)
+    return a.row > b.row
+  end)
+  for _, edit in ipairs(edits) do
+    api.nvim_buf_set_text(bufnr, edit.row, edit.col, edit.end_row, edit.end_col, edit.lines)
   end
 end
 
@@ -359,6 +434,7 @@ function M.move_sources()
               for _, source in ipairs(sources) do
                 remove_argument(lines, source.range, edits)
               end
+              merge_closer_edit(lines, command, sources, edits)
             end
 
             local target = args[1].text
@@ -405,6 +481,7 @@ function M.move_sources()
   for _, edit in ipairs(edits) do
     api.nvim_buf_set_text(bufnr, edit.row, edit.col, edit.end_row, edit.end_col, edit.lines)
   end
+  join_standalone_closers(bufnr, groups)
   vim.notify(
     string.format("Moved sources for %d target%s", vim.tbl_count(groups), vim.tbl_count(groups) > 1 and "s" or ""),
     vim.log.levels.INFO
