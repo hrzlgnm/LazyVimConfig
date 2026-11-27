@@ -117,40 +117,6 @@ local function is_indented_argument(lines, range)
   return line ~= nil and line:sub(1, range[2]):match("^%s*$") ~= nil
 end
 
---- Deleting a whole line keeps the list tidy; otherwise remove just the text.
-local function remove_argument(lines, range, edits)
-  local start_row, start_col, end_row, end_col = range[1], range[2], range[3], range[4]
-  local line = lines[start_row + 1]
-  if line == nil then
-    return
-  end
-  if start_row == end_row and line:sub(1, start_col):match("^%s*$") and line:sub(end_col + 1):match("^%s*$") then
-    table.insert(edits, { row = start_row, col = 0, end_row = start_row + 1, end_col = 0, lines = {} })
-    return
-  end
-
-  local before = line:sub(1, start_col)
-  local trailing = before:match("%s+$")
-  if before:match("^%s*$") then
-    -- Keep the line's indentation when a trailing comment remains, but drop
-    -- the gap that separated the removed argument from that comment.
-    local after = line:sub(end_col + 1)
-    local spaces = after:match("^%s+")
-    if spaces and after:sub(#spaces + 1):match("%S") then
-      end_col = end_col + #spaces
-    end
-  elseif trailing then
-    start_col = start_col - #trailing
-  else
-    local after = line:sub(end_col + 1)
-    local spaces = after:match("^%s+")
-    if spaces then
-      end_col = end_col + #spaces
-    end
-  end
-  table.insert(edits, { row = start_row, col = start_col, end_row = end_row, end_col = end_col, lines = {} })
-end
-
 local function closing_paren(lines, node)
   local row, col = node:end_()
   local line = lines[row + 1]
@@ -165,70 +131,55 @@ local function closing_paren(lines, node)
   return row, col
 end
 
---- When the command's interior lines hold only arguments and blank lines,
---- collapse the emptied command into a single line.
-local function collapse_edit(lines, command, sources, args)
-  local start_row = select(1, command.node:start())
-  local end_row = select(1, command.node:end_())
-  local closer = lines[end_row + 1]
-  if end_row <= start_row + 1 or closer == nil or closer:match("^%s*%)%s*$") == nil then
-    return nil
-  end
-
-  local source_rows = {}
-  for _, source in ipairs(sources) do
-    local row = source.range[1]
-    if row <= start_row or row >= end_row then
-      return nil
-    end
-    local line = lines[row + 1]
-    if line:sub(1, source.range[2]):match("^%s*$") == nil or line:sub(source.range[4] + 1):match("^%s*$") == nil then
-      return nil
-    end
-    source_rows[row] = true
-  end
-
-  local kept = {}
-  for row = start_row + 1, end_row - 1 do
-    local line = lines[row + 1]
-    if not source_rows[row] and line:match("^%s*$") == nil then
-      local found = nil
-      for _, arg in ipairs(args) do
-        if
-          arg.range[1] == row
-          and line:sub(1, arg.range[2]):match("^%s*$")
-          and line:sub(arg.range[4] + 1):match("^%s*$")
-        then
-          found = arg.text
-          break
-        end
-      end
-      if found == nil then
-        return nil
-      end
-      table.insert(kept, found)
-    end
-  end
-
-  local replacement = closer:gsub("^%s+", "")
-  if #kept > 0 then
-    replacement = " " .. table.concat(kept, " ") .. replacement
-  end
-  return {
-    row = start_row,
-    col = #lines[start_row + 1],
-    end_row = end_row,
-    end_col = #closer,
-    lines = { replacement },
-  }
-end
-
 local function insertion_lines(sources, indent)
   local result = {}
   for _, source in ipairs(sources) do
     table.insert(result, indent .. source)
   end
   return result
+end
+
+local function target_sources_block(target, sources, indent)
+  local block = {
+    indent .. "target_sources(" .. target,
+    indent .. "    PRIVATE",
+  }
+  for _, line in ipairs(insertion_lines(sources, indent .. "        ")) do
+    table.insert(block, line)
+  end
+  table.insert(block, indent .. ")")
+  return block
+end
+
+--- Replace the whole add_* command so the target remains closed with ")".
+local function rewrite_add(lines, command, args, extra_lines)
+  local start_row, start_col = command.node:start()
+  local end_row = select(1, command.node:end_())
+  local end_line = lines[end_row + 1]
+  local indent = leading_indent(lines[start_row + 1])
+
+  local kept = { args[1].text }
+  for i = 2, #args do
+    if declaration_keywords[args[i].text:upper()] then
+      table.insert(kept, args[i].text)
+    end
+  end
+
+  local trailing = end_line:sub(select(2, command.node:end_()) + 1)
+  local result = { indent .. command.name .. "(" .. table.concat(kept, " ") .. ")" .. trailing }
+
+  -- Keep comments that lived inside the command as standalone lines.
+  for row = start_row, end_row - 1 do
+    local comment = lines[row + 1]:match("#.*")
+    if comment then
+      table.insert(result, leading_indent(lines[row + 1]) .. comment)
+    end
+  end
+  for _, line in ipairs(extra_lines) do
+    table.insert(result, line)
+  end
+
+  return { row = start_row, col = start_col, end_row = end_row, end_col = #end_line, lines = result }
 end
 
 --- Add the sources to an existing target_sources command.
@@ -281,72 +232,6 @@ local function append_existing(lines, command, sources, edits)
   end
 end
 
---- Insert a new target_sources command after the last add_* command for a target.
-local function insert_new(bufnr, lines, target, command, sources, edits)
-  local indent = leading_indent(lines[command.node:start() + 1])
-  local insert = {
-    indent .. "target_sources(" .. target,
-    indent .. "    PRIVATE",
-  }
-  for _, source in ipairs(sources) do
-    table.insert(insert, indent .. "        " .. source)
-  end
-  table.insert(insert, indent .. ")")
-  table.insert(insert, "")
-
-  local end_row = select(1, command.node:end_())
-  local row = end_row + 1
-  if row >= api.nvim_buf_line_count(bufnr) then
-    -- set_text cannot insert past the last line, so append to it instead.
-    local at_eof = { "" }
-    for _, line in ipairs(insert) do
-      if line ~= "" then
-        table.insert(at_eof, line)
-      end
-    end
-    table.insert(edits, {
-      row = end_row,
-      col = #lines[end_row + 1],
-      end_row = end_row,
-      end_col = #lines[end_row + 1],
-      lines = at_eof,
-    })
-  else
-    table.insert(edits, { row = row, col = 0, end_row = row, end_col = 0, lines = insert })
-  end
-end
-
---- Fold a leftover standalone closing paren onto the last remaining line.
-local function merge_closer_edit(lines, command, sources, edits)
-  local start_row = select(1, command.node:start())
-  local end_row = select(1, command.node:end_())
-  local closer = lines[end_row + 1]
-  if closer == nil or closer:match("^%s*%)%s*$") == nil then
-    return
-  end
-
-  local removed = {}
-  for _, source in ipairs(sources) do
-    removed[source.range[1]] = true
-  end
-  local previous = end_row - 1
-  while previous > start_row and removed[previous] do
-    previous = previous - 1
-  end
-  local previous_line = lines[previous + 1]
-  if previous_line == nil or not previous_line:match("%S") or previous_line:gsub("^%s*", ""):sub(1, 1) == "#" then
-    return
-  end
-  for row = previous + 1, end_row - 1 do
-    if not removed[row] and lines[row + 1]:match("^%s*$") == nil then
-      return
-    end
-  end
-
-  local trimmed = previous_line:gsub("%s+$", "")
-  table.insert(edits, { row = previous, col = #trimmed, end_row = end_row, end_col = #closer, lines = { ")" } })
-end
-
 --- Move all inline source lists in the current CMake buffer into target_sources.
 function M.move_sources()
   local bufnr = api.nvim_get_current_buf()
@@ -382,16 +267,6 @@ function M.move_sources()
             end
           end
           if #sources > 0 then
-            local edit = collapse_edit(lines, command, sources, args)
-            if edit then
-              table.insert(edits, edit)
-            else
-              for _, source in ipairs(sources) do
-                remove_argument(lines, source.range, edits)
-              end
-              merge_closer_edit(lines, command, sources, edits)
-            end
-
             local target = args[1].text
             local group = groups[target]
             if group == nil then
@@ -408,6 +283,7 @@ function M.move_sources()
     end
   end
 
+  local extra_by_command = {}
   for target, group in pairs(groups) do
     local target_command = existing[target]
     if target_command then
@@ -419,7 +295,14 @@ function M.move_sources()
           last_command = command
         end
       end
-      insert_new(bufnr, lines, target, last_command, group.sources, edits)
+      local indent = leading_indent(lines[select(1, last_command.node:start()) + 1])
+      extra_by_command[last_command] = target_sources_block(target, group.sources, indent)
+    end
+  end
+
+  for _, group in pairs(groups) do
+    for _, command in ipairs(group.commands) do
+      table.insert(edits, rewrite_add(lines, command, command.args, extra_by_command[command] or {}))
     end
   end
 
