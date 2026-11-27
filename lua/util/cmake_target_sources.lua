@@ -266,22 +266,10 @@ local function append_existing(lines, command, sources, edits)
   end
 
   if close_row == range[3] then
-    -- Keep the closing paren on the last inserted source line.
+    -- The closer was on the same line as the old last argument: give it a
+    -- line of its own again.
+    table.insert(insert, leading_indent(lines[command.node:start() + 1]))
     table.insert(edits, { row = close_row, col = close_col, end_row = close_row, end_col = close_col, lines = insert })
-    return
-  end
-
-  local closer = lines[close_row + 1]
-  local last_line_clean = lines[range[3] + 1]:sub(range[4] + 1):match("^%s*$") ~= nil
-  if closer and closer:match("^%s*%)%s*$") and last_line_clean then
-    insert[#insert] = insert[#insert] .. ")"
-    table.insert(edits, {
-      row = range[3],
-      col = range[4],
-      end_row = close_row,
-      end_col = #closer,
-      lines = insert,
-    })
   else
     table.insert(edits, {
       row = range[3],
@@ -303,7 +291,7 @@ local function insert_new(bufnr, lines, target, command, sources, edits)
   for _, source in ipairs(sources) do
     table.insert(insert, indent .. "        " .. source)
   end
-  insert[#insert] = insert[#insert] .. ")"
+  table.insert(insert, indent .. ")")
   table.insert(insert, "")
 
   local end_row = select(1, command.node:end_())
@@ -357,39 +345,6 @@ local function merge_closer_edit(lines, command, sources, edits)
 
   local trimmed = previous_line:gsub("%s+$", "")
   table.insert(edits, { row = previous, col = #trimmed, end_row = end_row, end_col = #closer, lines = { ")" } })
-end
-
---- Fallback for blocks where the closer was left alone on its line.
-local function join_standalone_closers(bufnr, targets)
-  local commands = collect(bufnr)
-  if not commands then
-    return
-  end
-  local lines = api.nvim_buf_get_lines(bufnr, 0, -1, false)
-  local edits = {}
-  for _, command in ipairs(commands) do
-    local row = select(1, command.node:end_())
-    local closer = lines[row + 1]
-    local previous = row > 0 and lines[row] or nil
-    if
-      command.args[1]
-      and targets[command.args[1].text]
-      and closer
-      and previous
-      and closer:match("^%s*%)%s*$")
-      and previous:match("%S")
-      and previous:gsub("^%s*", ""):sub(1, 1) ~= "#"
-    then
-      local trimmed = previous:gsub("%s+$", "")
-      table.insert(edits, { row = row - 1, col = #trimmed, end_row = row, end_col = #closer, lines = { ")" } })
-    end
-  end
-  table.sort(edits, function(a, b)
-    return a.row > b.row
-  end)
-  for _, edit in ipairs(edits) do
-    api.nvim_buf_set_text(bufnr, edit.row, edit.col, edit.end_row, edit.end_col, edit.lines)
-  end
 end
 
 --- Move all inline source lists in the current CMake buffer into target_sources.
@@ -481,7 +436,6 @@ function M.move_sources()
   for _, edit in ipairs(edits) do
     api.nvim_buf_set_text(bufnr, edit.row, edit.col, edit.end_row, edit.end_col, edit.lines)
   end
-  join_standalone_closers(bufnr, groups)
   vim.notify(
     string.format("Moved sources for %d target%s", vim.tbl_count(groups), vim.tbl_count(groups) > 1 and "s" or ""),
     vim.log.levels.INFO
