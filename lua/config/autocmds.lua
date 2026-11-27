@@ -34,17 +34,23 @@ vim.api.nvim_create_autocmd("TermOpen", {
   end,
 })
 
--- CMake argument sorting (:CMakeSortAll, <M-y>) for cmake buffers
+-- CMake helpers: sorting (:CMakeSortAll, <M-y>) and moving sources into
+-- target_sources (:CMakeMoveSources, <M-x>) for cmake buffers
+local function attach_cmake(bufnr)
+  require("util.cmake_sort").attach(bufnr)
+  require("util.cmake_target_sources").attach(bufnr)
+end
+
 api.nvim_create_autocmd("FileType", {
-  group = augroup("cmake_sort"),
+  group = augroup("cmake_helpers"),
   pattern = "cmake",
   callback = function(args)
-    require("util.cmake_sort").attach(args.buf)
+    attach_cmake(args.buf)
   end,
 })
 -- autocmds load on VeryLazy, so attach to cmake buffers that are already open
 for _, buf in ipairs(api.nvim_list_bufs()) do
   if api.nvim_buf_is_loaded(buf) and vim.bo[buf].filetype == "cmake" then
-    require("util.cmake_sort").attach(buf)
+    attach_cmake(buf)
   end
 end

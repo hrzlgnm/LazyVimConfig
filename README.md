@@ -57,6 +57,7 @@ Only additions on top of the [LazyVim defaults](https://www.lazyvim.org/keymaps)
 | `<C-d>` / `<C-u>` | n | half page down/up, centered |
 | `J` | n | join lines, keep cursor position |
 | `<M-y>` | n (cmake) | sort all CMake argument lists in the file |
+| `<M-x>` | n (cmake) | move `add_executable` / `add_library` sources into `target_sources` |
 | `<leader>gr…` | n/v | PR review (fude.nvim): `t` toggle, `s` start, `q` stop, `c` comment, `S` suggest, `n`/`p` next/prev file, `f` files, `o` overview, … |
 
 ## Other behaviour
@@ -68,6 +69,11 @@ Only additions on top of the [LazyVim defaults](https://www.lazyvim.org/keymaps)
   `:CMakeSelectFirstSortableRange` sort arguments of `target_sources`,
   `target_link_libraries`, `add_executable`, `set`, `list`, … case-insensitively, leaving
   keywords such as `PRIVATE`/`PUBLIC` in place. Available in cmake buffers only.
+- **CMake source extraction** (`lua/util/cmake_target_sources.lua`): `:CMakeMoveSources`
+  moves source paths from `add_executable`/`add_library` into `target_sources`,
+  appending to an existing block for the target or creating a `PRIVATE` one. Declaration
+  options (`STATIC`, `WIN32`, `EXCLUDE_FROM_ALL`, `ALIAS`, …) stay with the `add_*`
+  command; alias/imported/interface targets are skipped. Available in cmake buffers only.
 - **Filetypes** (`lua/config/options.lua`): systemd unit extensions (`*.service`,
   `*.network`, …) anywhere, `.gersemirc*` as YAML, a few board configs as `dosini`.
 - **Terminals** start in insert mode without line numbers and close when the process exits
